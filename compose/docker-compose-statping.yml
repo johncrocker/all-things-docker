@@ -1,0 +1,20 @@
+version: "3.3"
+
+services:
+  statping:
+    image: adamboutcher/statping-ng:latest
+    container_name: statping
+    restart: unless-stopped
+    ports:
+      - 8085:8080
+    volumes:
+      - "statping-data:/app"
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Statping-ng
+      - homepage.href=http://statping.lan
+      - homepage.description=Statping Service
+    environment:
+      TZ: 'Europe/London'
+volumes:
+  statping-data:

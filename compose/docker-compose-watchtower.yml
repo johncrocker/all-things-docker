@@ -1,0 +1,16 @@
+version: "3.3"
+
+services:
+  watchtower:
+    image: containrrr/watchtower
+    restsrt: unless-stoppedx
+    container_name: watchtower
+    environment:
+      TZ: 'Europe/London'
+      WATCHTOWER_SCHEDULE: '0 0 23 * * *'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Watchtower
+      - homepage.description=Watchtower Service

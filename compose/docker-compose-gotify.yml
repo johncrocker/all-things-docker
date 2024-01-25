@@ -1,0 +1,22 @@
+version: "3.3"
+
+services:
+  gotify:
+    image: gotify/server-arm64:latest
+    container_name: gotify
+    restart: unless-stopped
+    ports:
+      - 8086:80
+    environment:
+      TZ: 'Europe/London'
+      GOTIFY_DEFAULTUSER_PASS: 'Password123'
+    volumes:
+      - "gotify-data:/app/data"
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Gotify
+      - homepage.href=http://gotify.lan
+      - homepage.description=Gotify Notification Service
+
+volumes:
+  gotify-data:

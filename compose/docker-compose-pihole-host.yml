@@ -1,0 +1,60 @@
+#version: "3.3"
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    hostname: pihole
+    environment:
+      TZ: 'Europe/London'
+      DHCP_ACTIVE: 'false'
+      DHCP_END: '192.168.1.200'
+      DHCP_IPv6: 'false'
+      DHCP_LEASETIME: 24
+      DHCP_rapid_commit: 'true'
+      DHCP_ROUTER: '192.168.1.1'
+      DHCP_START: '192.168.1.10'
+      DNSMASQ_LISTENING: "all"
+      PIHOLE_DNS_: "9.9.9.10;149.112.112.10;$DOCKER_GATEWAY_HOST#5300"
+      PIHOLE_DOMAIN: "lan"
+      ServerIP: '192.168.1.201'
+      VIRTUAL_HOST: 'pihole.lan'
+      WEBPASSWORD: ${DOCKER_CONTAINER_PWD}
+      WEB_PORT: '8080'
+      IPv6: "false"
+    volumes:
+      - 'pihole:/etc/pihole/'
+      - 'dnsmasq.d:/etc/dnsmasq.d/'
+    depends_on:
+      - unbound
+    cap_add:
+      - NET_ADMIN
+      - NET_BIND_SERVICE
+      - NET_RAW
+      - SYS_NICE
+      - CHOWN
+    restart: unless-stopped
+    network_mode: 'host'
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - homepage.group=Containers
+      - homepage.name=PiHole
+      - homepage.href=http://pihole.lan/admin/
+      - homepage.description=PiHole Service
+
+  unbound:
+    restart: unless-stopped
+    container_name: unbound
+    image: cdrocker/unbound:latest
+    volumes:
+      - 'unbound-data:/etc/unbound/conf.d/'
+    cap_add:
+      - NET_ADMIN
+    network_mode: 'host'
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+
+volumes:
+  pihole:
+  dnsmasq.d:
+  unbound-data:

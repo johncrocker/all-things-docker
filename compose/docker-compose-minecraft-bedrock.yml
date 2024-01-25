@@ -1,0 +1,26 @@
+version: "3.3"
+
+services:
+ minecraft:
+   image: itzg/minecraft-bedrock-server:latest
+   ports:
+     - "19132:19132/udp"
+   environment:
+     EULA: "TRUE"
+     GAMEMODE: survival
+     DIFFICULTY: normal
+   restart: unless-stopped
+   deploy:
+     resources:
+       limits:
+         memory: 1.5G
+   volumes:
+     - minecraft-bedrock-data:/data
+   labels:
+     - homepage.group=Containers
+     - homepage.name=Minecraft Bedrock
+     - homepage.description=Minecraft Service
+
+volumes:
+  minecraft-bedrock-data:
+

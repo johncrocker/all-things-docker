@@ -1,0 +1,26 @@
+version: "3.3"
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - 8081:3000
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - CONTAINERS=1 # Allow access to viewing containers
+      - SERVICES=1 # Allow access to viewing services (necessary when using Docker Swarm)
+      - TASKS=1 # Allow access to viewing tasks (necessary when using Docker Swarm)
+      - POST=0 # Disallow any POST operations (effectively read-only) 
+    volumes:
+      - homepage_data:/app/config/
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Homepage
+      - homepage.href=http://homepage.lan/
+      - homepage.description=Homepage Service
+
+volumes:
+  homepage_data:

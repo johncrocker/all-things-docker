@@ -1,0 +1,23 @@
+version: "3.3"
+
+services:
+  yacht:
+    container_name: yacht
+    image: selfhostedpro/yacht
+    hostname: yacht
+    ports:
+      - "8001:8000/tcp"
+    environment:
+      TZ: 'Europe/London'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - "yacht_data:/config"
+    restart: always
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Yacht
+      - homepage.href=http://yacht.lan/
+      - homepage.description=Yacht Container Manager
+
+volumes:
+  yacht_data:

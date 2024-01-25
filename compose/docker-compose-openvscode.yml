@@ -13,8 +13,9 @@ services:
     volumes:
       - "openvscode_data:/home/workspace:cached"
     labels:
-      - home  page.group=Containers
+      - homepage.group=Containers
       - homepage.name=Open VS Code
+      - homepage.href=http://openvscode.lan
       - homepage.description=Visual Studio Code as a Web App
 
 volumes:

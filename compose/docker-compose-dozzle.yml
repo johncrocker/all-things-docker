@@ -1,0 +1,19 @@
+version: "3.3"
+
+services:
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    hostname: dozzle
+    ports:
+      - "8082:8080/tcp"
+    environment:
+      TZ: 'Europe/London'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Dozzle
+      - homepage.href=http://dozzle.lan/
+      - homepage.description=Dozzle Container log viewer

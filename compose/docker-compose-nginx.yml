@@ -1,0 +1,26 @@
+version: "3.3"
+
+services:
+  nginxproxymanager:
+    container_name: nginxproxymanager
+    image: jc21/nginx-proxy-manager:latest
+    hostname: nginxproxymanager
+    ports:
+      - "80:80/tcp"
+      - "81:81/tcp"
+      - "443:443/tcp"
+    environment:
+      TZ: 'Europe/London'
+    volumes:
+      - "nginx_data:/data"
+      - "nginx_letsencrypt:/etc/letsencrypt"
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=NGINX Proxy Manager
+      - homepage.href=http://192.168.1.201:81/login
+      - homepage.description=NGINX Proxy iManager
+
+volumes:
+  nginx_data:
+  nginx_letsencrypt:

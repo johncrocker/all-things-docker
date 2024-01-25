@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:alpine
+    command: -H unix:///var/run/docker.sock
+    hostname: portainer
+    ports:
+      - "8000:8000/tcp"
+      - "9443:9443/tcp"
+    environment:
+      TZ: 'Europe/London'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - "portainer_data:/data"
+    restart: always
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Portainer
+      - homepage.href=http://portainer.lan/
+      - homepage.description=Portainer Container Manager
+
+volumes:
+  portainer_data:

@@ -1,0 +1,17 @@
+version: "3.3"
+
+services:
+  glances:
+    image: nicolargo/glances:latest
+    container_name: glances
+    restart: unless-stopped
+    ports:
+      - 8086:80
+    environment:
+      TZ: 'Europe/London'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Glances
+      - homepage.description=Glances System Monitor Service

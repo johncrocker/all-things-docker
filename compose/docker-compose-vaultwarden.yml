@@ -6,7 +6,7 @@ services:
     container_name: vaultwarden
     restart: unless-stopped
     ports:
-      - "8081:80"
+      - "8086:80"
     environment:
       - DOMAIN=https://vaultwarden.lan
       - LOGIN_RATELIMIT_MAX_BURST=10
@@ -23,7 +23,7 @@ services:
     labels:
       - homepage.group=Containers
       - homepage.name=Vaultwarden
-      - homepage.href=http://vaultwarden.lan/
+      - homepage.href=https://vaultwarden.lan/
       - homepage.description=Vaultwarden Service
 
 volumes:

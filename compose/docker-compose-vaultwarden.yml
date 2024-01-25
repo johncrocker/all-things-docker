@@ -23,7 +23,7 @@ services:
     labels:
       - homepage.group=Containers
       - homepage.name=Vaultwarden
-      - homepage.href=http://vaultwarden.lan/
+      - homepage.href=https://vaultwarden.lan/
       - homepage.description=Vaultwarden Service
 
 volumes:

@@ -26,7 +26,7 @@ Here are the Port Allocations per Container Stack
 | Vaultwarden                                           | docker-compose-vaultwarden.yml       | 3011         |                          |
 | Watchtower                                            | docker-compose-watchtower.yml        | n/a          |                          |
 | Yacht                                                 | docker-compose-yacht.yml             | 3012         |                          |
-| Gogs Git Version Control                              | docker-compose-gogs.yml              | 3013         |  10022                   |                 
+| Gogs Git Version Control                              | docker-compose-gogs.yml              | 3013         |  10022, 5432             |             
 
 * Note: Specified by configuration not orchestration
 

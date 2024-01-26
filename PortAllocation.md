@@ -28,7 +28,7 @@ Here are the Port Allocations per Container Stack
 | Yacht                                                 | docker-compose-yacht.yml             | 3012         |                          |
 | Gogs Git Version Control                              | docker-compose-gogs.yml              | 3013         | 10022, 5432              |             
 | PostgreSQL                                            | docker-compose-postgres.yml          |              | 5432                     |
-| Neo4J                                                 | docker-compose-neo4j.yml             |             |
+| Neo4J                                                 | docker-compose-neo4j.yml             | 7474         | 7687                     |
 
       
 * Note: Specified by configuration not orchestration

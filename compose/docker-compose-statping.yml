@@ -6,7 +6,7 @@ services:
     container_name: statping
     restart: unless-stopped
     ports:
-      - 8085:8080
+      - 3010:8080
     volumes:
       - "statping-data:/app"
     labels:

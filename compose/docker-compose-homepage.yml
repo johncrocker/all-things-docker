@@ -5,7 +5,7 @@ services:
     container_name: homepage
     restart: unless-stopped
     ports:
-      - 8081:3000
+      - 3005:3000
     environment:
       - PUID=$PUID
       - PGID=$PGID

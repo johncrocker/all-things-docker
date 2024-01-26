@@ -6,7 +6,7 @@ services:
     image: amir20/dozzle:latest
     hostname: dozzle
     ports:
-      - "8082:8080/tcp"
+      - "3002:8080/tcp"
     environment:
       TZ: 'Europe/London'
     volumes:

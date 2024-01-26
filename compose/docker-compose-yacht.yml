@@ -6,7 +6,7 @@ services:
     image: selfhostedpro/yacht
     hostname: yacht
     ports:
-      - "8001:8000/tcp"
+      - "3012:8000/tcp"
     environment:
       TZ: 'Europe/London'
     volumes:

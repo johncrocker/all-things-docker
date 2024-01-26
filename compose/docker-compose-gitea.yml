@@ -13,7 +13,7 @@ services:
     volumes:
       - gitea-git-data:/data
     ports:
-      - 8088:3000
+      - 3003:3000
     labels:
       - homepage.group=Containers
       - homepage.name=Gitea

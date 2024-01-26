@@ -6,7 +6,7 @@ services:
     container_name: gotify
     restart: unless-stopped
     ports:
-      - 8086:80
+      - 3004:80
     environment:
       TZ: 'Europe/London'
       GOTIFY_DEFAULTUSER_PASS: 'Password123'

@@ -6,7 +6,7 @@ services:
     container_name: ciao
     restart: unless-stopped
     ports:
-      - '8086:3000'
+      - '3001:3000'
     environment:
       - SECRET_KEY_BASE=baad3cf6-47df-43c0-8f7c-6ade1ee13b9d
       - TZ=Eurooe/London

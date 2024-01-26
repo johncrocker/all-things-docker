@@ -1,0 +1,37 @@
+version: "3.3"
+
+services:
+  gogs:
+    image: gogs/gogs:latest
+    container_name: gogs
+    restart: unless-stopped
+    ports:
+      - '3013:3000'
+      - '10022:22'
+    depends_on:
+     - db
+    environment:
+      - TZ=Eurooe/London
+    volumes:
+      - "gogs-data:/data"
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Gogs
+      - homepage.href=http://gogs.lan
+      - homepage.description=Gogs Git Version Control
+
+  db:
+   image: postgres:alpine
+   environment:
+     - POSTGRES_USER=gogs
+     - POSTGRES_PASSWORD=gogs
+     - POSTGRES_DB=gogs
+   restart: unless-stopped
+   volumes:
+     - gogs-db-data:/var/lib/postgresql/data
+   expose:
+     - 5432
+
+volumes:
+  gogs-data:
+  gogs-db-data:

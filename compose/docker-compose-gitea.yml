@@ -14,6 +14,8 @@ services:
       - gitea-git-data:/data
     ports:
       - 3003:3000
+    depends_on:
+     - db
     labels:
       - homepage.group=Containers
       - homepage.name=Gitea
@@ -31,6 +33,7 @@ services:
       - gitea-db-data:/var/lib/postgresql/data
     expose:
       - 5432
+
 volumes:
   gitea-db-data:
   gitea-git-data:

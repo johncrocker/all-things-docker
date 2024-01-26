@@ -1,5 +1,4 @@
 version: "3.3"
-name: "gitea-stack"
 
 services:
   gitea:
@@ -10,11 +9,11 @@ services:
       - DB_NAME=gitea
       - DB_USER=gitea
       - DB_PASSWD=gitea
-    restart: unless_stopped
+    restart: unless-stopped
     volumes:
       - gitea-git-data:/data
     ports:
-      - 3000:3000
+      - 3003:3000
     labels:
       - homepage.group=Containers
       - homepage.name=Gitea
@@ -27,7 +26,7 @@ services:
       - POSTGRES_USER=gitea
       - POSTGRES_PASSWORD=gitea
       - POSTGRES_DB=gitea
-    restart: always
+    restart: unless-stopped
     volumes:
       - gitea-db-data:/var/lib/postgresql/data
     expose:

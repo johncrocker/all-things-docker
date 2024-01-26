@@ -9,7 +9,7 @@ services:
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "8080:80/tcp"
+      - "3008:80/tcp"
     environment:
       TZ: 'Europe/London'
       FTLCONF_dhcp_active: 'false'

@@ -7,7 +7,7 @@ services:
     command: -H unix:///var/run/docker.sock
     hostname: portainer
     ports:
-      - "8000:8000/tcp"
+      - "3009:8000/tcp"
       - "9443:9443/tcp"
     environment:
       TZ: 'Europe/London'

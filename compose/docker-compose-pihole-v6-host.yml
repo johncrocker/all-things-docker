@@ -21,7 +21,7 @@ services:
       ServerIP: '192.168.1.201'
       VIRTUAL_HOST: 'piholev6.lan'
       FTLCONF_webserver_api_password: ${DOCKER_CONTAINER_PWD}
-      FTLCONF_webserver_port: '8080'
+      FTLCONF_webserver_port: '3008'
       IPv6: "false"
     volumes:
       - 'pihole:/etc/pihole/'

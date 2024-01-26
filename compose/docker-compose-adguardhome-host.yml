@@ -4,20 +4,20 @@ services:
   adguardhome:
     image: adguard/adguardhome:latest
     restart: unless-stopped
-     container_name: adguardhome
-     network_mode: "host"
-ķ    environment:
+    container_name: adguardhome
+    command: "-p 3000"
+    network_mode: "host"
+    environment:
       TZ: 'Europe/London'
     volumes:
       - "adguardhome_data:/opt/adguardhome/work"
       - "adguardhome_conf:/opt/adguardhome/conf"
-    label
-      - h
-omepage.group=Containers
+    labels:
+      - homepage.group=Containers
       - homepage.name=Adguard Home Ad Blocker
       - homepage.href=http://adguardhome.lan
       - homepage.description=AdGuard Home edition service
 
 volumes:
   adguardhome_data:
-  adguardhoke_conf:
+  adguardhome_conf:

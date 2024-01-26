@@ -7,7 +7,7 @@ services:
     init: true
     container_name: openvscode
     ports:
-      - "8087:3000"
+      - "3006:3000"
     environment:
       TZ: 'Europe/London'
     volumes:

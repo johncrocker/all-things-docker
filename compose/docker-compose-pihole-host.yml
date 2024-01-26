@@ -20,7 +20,7 @@ services:
       ServerIP: '192.168.1.201'
       VIRTUAL_HOST: 'pihole.lan'
       WEBPASSWORD: ${DOCKER_CONTAINER_PWD}
-      WEB_PORT: '8080'
+      WEB_PORT: '3007'
       IPv6: "false"
     volumes:
       - 'pihole:/etc/pihole/'

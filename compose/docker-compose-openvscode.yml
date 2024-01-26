@@ -1,0 +1,22 @@
+version: "3.3"
+
+services:
+  openvscode:
+    image: gitpod/openvscode-server:latest
+    restart: unless-stopped
+    init: true
+    container_name: openvscode
+    ports:
+      - "8087:3000"
+    environment:
+      TZ: 'Europe/London'
+    volumes:
+      - "openvscode_data:/home/workspace:cached"
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Open VS Code
+      - homepage.href=http://openvscode.lan
+      - homepage.description=Visual Studio Code as a Web App
+
+volumes:
+  openvscode_data:

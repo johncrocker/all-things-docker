@@ -32,5 +32,5 @@ Here are the Port Allocations per Container Stack
 | Homeassistant                                         | docker-compose-homeassistant.yml     | 8123 *       |                          |
       
 
-* Note: Specified by configuration not orchestration
+\* Note: Specified by configuration not orchestration
 

@@ -1,0 +1,26 @@
+#version: "3.3"
+
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: homeassistant/home-assistant:stable
+    hostname: homeassistant
+    privileged: true
+    network_mode: "host"
+    environment:
+      TZ: 'Europe/London'
+      DISABLE_JEMALLOC: 'true'
+    volumes:
+      - 'hass_config:/config'
+      - '/run/dbus:/run/dbus:ro'
+      - '/etc/localtime:/etc/localtime:ro'
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - homepage.group=Containers
+      - homepage.name=Homeassistant
+      - homepage.href=http://192.168.1.201:8123/
+      - homepage.description=Homeassistant Manager Service
+
+volumes:
+  hass_config:

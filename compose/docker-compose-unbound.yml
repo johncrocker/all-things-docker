@@ -5,10 +5,15 @@ services:
     restart: unless-stopped
     container_name: unbound
     image: cdrocker/unbound:latest
+    volumes:
+      - 'unbound-data:/etc/unbound/conf.d/'
     ports:
-      - "53:53/udp"
-      - "53:53/tcp"
+      - "5300:53/udp"
+      - "5300:53/tcp"
     cap_add:
       - NET_ADMIN
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+
+volumes:
+  unbound-data:

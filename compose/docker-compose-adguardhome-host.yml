@@ -10,8 +10,8 @@ services:
     environment:
       TZ: 'Europe/London'
     volumes:
-      - "adguardhome_data:/opt/adguardhome/work"
-      - "adguardhome_conf:/opt/adguardhome/conf"
+      - "adguardhome_data:/opt/adguardhome/data"
+      - "${DOCKER_CONTAINER_CONFIG_DIR}/AdGuardHome.yaml:/opt/adguardhome/AdGuardHome.yaml"
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
       - homepage.group=Containers

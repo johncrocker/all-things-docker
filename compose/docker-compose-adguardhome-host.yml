@@ -5,13 +5,13 @@ services:
     image: adguard/adguardhome:latest
     restart: unless-stopped
     container_name: adguardhome
-    command: "-p 3000"
+    command: "-p 3000 -c /opt/adguardhome/conf/AdGuardHome.yaml"
     network_mode: "host"
     environment:
       TZ: 'Europe/London'
     volumes:
       - "adguardhome_data:/opt/adguardhome/data"
-      - "${DOCKER_CONTAINER_CONFIG_DIR}/AdGuardHome.yaml:/opt/adguardhome/AdGuardHome.yaml"
+      - "adguardhome_conf:/opt/adguardhome/conf"
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
       - homepage.group=Containers

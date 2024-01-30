@@ -6,7 +6,7 @@ services:
        ytdl_mongodb_connection_string: 'mongodb://ytdl-mongo-db:27017'
        ytdl_use_local_db: 'false'
        write_ytdl_config: 'true'
-    restart: unless_stopped
+    restart: unless-stopped
     container_name: ytdl-ui
     depends_on:
       - ytdl-mongo-db
@@ -25,7 +25,7 @@ services:
     logging:
       driver: "none"
     container_name: ytdl-mongo-db
-    restart: unless_stopped
+    restart: unless-stopped
     volumes:
       - "mongo_data:/data/db"
 

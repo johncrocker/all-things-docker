@@ -19,6 +19,11 @@ services:
     ports:
       - "3014:17442"
     image: tzahi12345/youtubedl-material:latest
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Youtube Downloader
+      - homepage.href=http://youtubedl.lan
+      - homepage.description=Youtube Downloader Service
 
   ytdl-mongo-db:
     image: mongo:4.4.19

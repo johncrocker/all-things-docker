@@ -33,9 +33,11 @@ services:
     restart: unless-stopped
     volumes:
       - "mongo_data:/data/db"
-
+      - "config_data:/data/configdb"
+"
 volumes:
   mongo_data:
+  config_data:
   users:
   subscriptions:
   video:

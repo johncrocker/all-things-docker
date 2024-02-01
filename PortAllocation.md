@@ -31,7 +31,8 @@ Here are the Port Allocations per Container Stack
 | PostgreSQL                                            | docker-compose-postgres.yml          |              | 5432                     |
 | Neo4J                                                 | docker-compose-neo4j.yml             | 7474         | 7687                     |
 | Homeassistant                                         | docker-compose-homeassistant.yml     | 8123 *       |                          |
-      
+| Glances                                               | docker-compose-glances.yml           | 61208, 61209 |                          |      
 
-\* Note: Specified by configuration not orchestration
+\* 
+Note: Specified by configuration not orchestration
 

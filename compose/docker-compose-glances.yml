@@ -6,12 +6,15 @@ services:
     container_name: glances
     restart: unless-stopped
     ports:
-      - 8086:80
+      - "61208:61208"
+      - "61209:61209"
     environment:
       TZ: 'Europe/London'
+      GLANCES_OPT: "-w"
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
     labels:
       - homepage.group=Containers
+      - homepage.href=http://192.168.1.201:61208
       - homepage.name=Glances
       - homepage.description=Glances System Monitor Service

@@ -8,7 +8,6 @@ Here are the Port Allocations per Container Stack
 | Ciao                                                  | docker-compose-ciao.yml              | 3001         |                          |
 | Dozzle                                                | docker-compose-dozzle.yml            | 3002         |                          |
 | Gitea                                                 | docker-compose-gitea.yml             | 3003         | 5432                     |
-| Glances                                               | docker-compose-glances.yml           | n/a          |                          |
 | Gotify                                                | docker-compose-gotify.yml            | 3004         |                          |
 | Homepage                                              | docker-compose-homepage.yml          | 3005         |                          |
 | Minecraft Bedrock Server                              | docker-compose-minecraft-bedrock.yml | n/a          | 19132                    |

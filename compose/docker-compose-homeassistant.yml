@@ -1,4 +1,4 @@
-#version: "3.3"
+version: "3.3"
 
 services:
   homeassistant:
@@ -21,6 +21,9 @@ services:
       - homepage.name=Homeassistant
       - homepage.href=http://192.168.1.201:8123/
       - homepage.description=Homeassistant Manager Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=stable"
 
 volumes:
   hass_config:

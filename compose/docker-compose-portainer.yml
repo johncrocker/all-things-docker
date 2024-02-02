@@ -20,6 +20,9 @@ services:
       - homepage.name=Portainer
       - homepage.href=http://portainer.lan/
       - homepage.description=Portainer Container Manager
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
 volumes:
   portainer_data:

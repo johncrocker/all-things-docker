@@ -21,6 +21,9 @@ services:
       - homepage.name=Gitea
       - homepage.href=http://gitea.lan/
       - homepage.description=Gitea Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
   db:
     image: postgres:alpine
@@ -32,7 +35,11 @@ services:
     volumes:
       - gitea-db-data:/var/lib/postgresql/data
     expose:
-      - 5432
+        - 5432
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=alpine"
 
 volumes:
   gitea-db-data:

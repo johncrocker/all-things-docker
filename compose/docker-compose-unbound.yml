@@ -14,6 +14,9 @@ services:
       - NET_ADMIN
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
   unbound-dns-b:
     restart: unless-stopped
@@ -28,6 +31,9 @@ services:
       - NET_ADMIN
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
 volumes:
   unbound-a-data:

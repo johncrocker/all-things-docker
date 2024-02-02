@@ -41,6 +41,9 @@ services:
       - homepage.name=PiHole
       - homepage.href=http://pihole.lan/admin/
       - homepage.description=PiHole Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
   unbound:
     restart: unless-stopped
@@ -53,6 +56,9 @@ services:
     network_mode: 'host'
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
 volumes:
   pihole:

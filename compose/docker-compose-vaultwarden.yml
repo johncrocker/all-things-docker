@@ -25,6 +25,9 @@ services:
       - homepage.name=Vaultwarden
       - homepage.href=https://vaultwarden.lan/
       - homepage.description=Vaultwarden Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
 volumes:
   vaultwarden-stack_data:

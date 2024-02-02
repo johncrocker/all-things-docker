@@ -19,6 +19,9 @@ services:
       - homepage.name=Gogs
       - homepage.href=http://gogs.lan
       - homepage.description=Gogs Git Version Control
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
   db:
    image: postgres:alpine
@@ -31,6 +34,10 @@ services:
      - gogs-db-data:/var/lib/postgresql/data
    expose:
      - 5432
+   labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=alpine"
 
 volumes:
   gogs-data:

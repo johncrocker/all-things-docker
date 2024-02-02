@@ -20,6 +20,9 @@ services:
       - homepage.name=NGINX Proxy Manager
       - homepage.href=http://192.168.1.201:81/login
       - homepage.description=NGINX Proxy iManager
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
 volumes:
   nginx_data:

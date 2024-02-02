@@ -24,6 +24,9 @@ services:
       - homepage.name=Youtube Downloader
       - homepage.href=http://youtubedl.lan
       - homepage.description=Youtube Downloader Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
   ytdl-mongo-db:
     image: mongo:4.4.19
@@ -34,7 +37,11 @@ services:
     volumes:
       - "mongo_data:/data/db"
       - "config_data:/data/configdb"
-"
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=4.4.19"
+
 volumes:
   mongo_data:
   config_data:

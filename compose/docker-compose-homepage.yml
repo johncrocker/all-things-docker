@@ -21,6 +21,9 @@ services:
       - homepage.name=Homepage
       - homepage.href=http://homepage.lan/
       - homepage.description=Homepage Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
 volumes:
   homepage_data:

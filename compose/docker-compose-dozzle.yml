@@ -17,3 +17,6 @@ services:
       - homepage.name=Dozzle
       - homepage.href=http://192.168.1.201:3002
       - homepage.description=Dozzle Container log viewer
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"

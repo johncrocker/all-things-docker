@@ -36,7 +36,7 @@ services:
       - NET_ADMIN
       - NET_BIND_SERVICE
       - NET_RAW
-        - SYS_NICE
+      - SYS_NICE
       - CHOWN
     restart: unless-stopped
     networks:
@@ -48,6 +48,9 @@ services:
       - homepage.name=PiHole v6
       - homepage.href=http://192.269.1.202:8084/admin/
       - homepage.description=PiHole v6 Beta Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=development-v6"
 
   unbound:
     restart: unless-stopped
@@ -62,6 +65,9 @@ services:
      - NET_ADMIN
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
 networks:
   backend:

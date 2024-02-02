@@ -17,6 +17,9 @@ services:
       - homepage.name=Gotify
       - homepage.href=http://gotify.lan
       - homepage.description=Gotify Notification Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
 volumes:
   gotify-data:

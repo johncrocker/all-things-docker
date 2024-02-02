@@ -14,6 +14,9 @@ services:
       - homepage.name=Statping-ng
       - homepage.href=http://statping.lan
       - homepage.description=Statping Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
     environment:
       TZ: 'Europe/London'
 volumes:

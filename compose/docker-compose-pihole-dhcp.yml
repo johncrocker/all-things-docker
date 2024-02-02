@@ -47,6 +47,9 @@ services:
       - homepage.name=PiHole
       - homepage.href=http://pihole.lan/admin/
       - homepage.description=PiHole Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
   unbound:
     restart: unless-stopped
@@ -61,6 +64,9 @@ services:
       - NET_ADMIN
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
   dhcphelper:
     restart: unless-stopped
@@ -74,6 +80,9 @@ services:
       - NET_ADMIN
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
 
 networks:
   backend:

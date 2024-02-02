@@ -20,6 +20,9 @@ services:
      - homepage.group=Containers
      - homepage.name=Minecraft Bedrock
      - homepage.description=Minecraft Service
+     - "diun.enable=true"
+     - "diun.watch_repo=true"
+     - "diun.include_tags=latest"
 
 volumes:
   minecraft-bedrock-data:

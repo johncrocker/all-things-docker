@@ -1,6 +1,7 @@
 version: "3.5"
 services:
   postgres:
+    container_name: postgres
     image: postgres:alpine
     env_file: .env
     restart: unless-stopped
@@ -12,6 +13,7 @@ services:
       - "diun.include_tags=alpine"
 
   linkwarden:
+    container_name: linkwarden
     env_file: .env
     environment:
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres

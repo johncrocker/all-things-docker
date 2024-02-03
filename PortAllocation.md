@@ -31,7 +31,8 @@ Here are the Port Allocations per Container Stack
 | Neo4J                                                 | docker-compose-neo4j.yml             | 7474         | 7687                     |
 | Homeassistant                                         | docker-compose-homeassistant.yml     | 8123 *       |                          |
 | Glances                                               | docker-compose-glances.yml           | 61208, 61209 |                          |      
+| Linkwarden                                            | docker-compose-linkwarden.yml        | 3015         |                          |
 
-\* 
-Note: Specified by configuration not orchestration
+
+\* Note: Specified by configuration not orchestration
 

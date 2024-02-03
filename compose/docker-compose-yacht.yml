@@ -7,8 +7,6 @@ services:
     hostname: yacht
     ports:
       - "3012:8000/tcp"
-    environment:
-      TZ: 'Europe/London'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - "yacht_data:/config"

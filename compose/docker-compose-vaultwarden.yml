@@ -7,17 +7,6 @@ services:
     restart: unless-stopped
     ports:
       - "3011:80"
-    environment:
-      - DOMAIN=https://vaultwarden.lan
-      - LOGIN_RATELIMIT_MAX_BURST=10
-      - LOGIN_RATELIMIT_SECONDS=60
-      - ADMIN_RATELIMIT_MAX_BURST=10
-      - ADMIN_RATELIMIT_SECONDS=60
-      - ADMIN_TOKEN=$$argon2id$$v=19$$m=65540,t=3,p=4$$T7mO+uH+5l7atBvPJEHAl+dxfVbEYs9Og/5DqWaSpKI$$2C2q9VlCFPsIycC00PxY0tiPI+lCqtYoBh7CBJsSgD0
-      - SENDS_ALLOWED=true
-      - EMERGENCY_ACCESS_ALLOWED=true
-      - WEB_VAULT_ENABLED=true
-      - WEBSOCKET_ENABLED=false
     volumes:
       - vaultwarden-stack_data:/data/
     labels:

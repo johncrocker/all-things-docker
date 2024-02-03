@@ -8,8 +8,6 @@ services:
     container_name: openvscode
     ports:
       - "3006:3000"
-    environment:
-      TZ: 'Europe/London'
     volumes:
       - "openvscode_data:/home/workspace:cached"
     labels:

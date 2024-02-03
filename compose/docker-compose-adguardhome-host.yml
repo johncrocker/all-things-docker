@@ -7,8 +7,6 @@ services:
     container_name: adguardhome
     command: "-p 3000 -c /opt/adguardhome/conf/AdGuardHome.yaml"
     network_mode: "host"
-    environment:
-      TZ: 'Europe/London'
     volumes:
       - "adguardhome_data:/opt/adguardhome/data"
       - "adguardhome_conf:/opt/adguardhome/conf"

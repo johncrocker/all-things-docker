@@ -7,9 +7,6 @@ services:
     hostname: homeassistant
     privileged: true
     network_mode: "host"
-    environment:
-      TZ: 'Europe/London'
-      DISABLE_JEMALLOC: 'true'
     volumes:
       - 'hass_config:/config'
       - '/run/dbus:/run/dbus:ro'

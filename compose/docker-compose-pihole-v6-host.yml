@@ -5,24 +5,6 @@ services:
     container_name: pihole
     image: pihole/pihole:development-v6
     hostname: piholev6
-    environment:
-      TZ: 'Europe/London'
-      FTLCONF_dhcp_active: 'false'
-      FTLCONF_dhcp_end: '192.168.1.200'
-      FTLCONF_dhcp_netmask: '255.255.255.0'
-      FTLCONF_dhcp_ipv6: 'false'
-      FTLCONF_dhcp_leaseTime : 24
-      FTLCONF_dhcp_rapidCommit: 'true'
-      FTLCONF_dhcp_router: '192.168.1.1'
-      FTLCONF_dhcp_start: '192.168.1.10'
-      FTLCONF_dns_listeningMode: "all"
-      FTLCONF_dns_upstreams: "9.9.9.10;149.112.112.10"
-      FTLCONF_dns_domain: "lan"
-      ServerIP: '192.168.1.201'
-      VIRTUAL_HOST: 'piholev6.lan'
-      FTLCONF_webserver_api_password: ${DOCKER_CONTAINER_PWD}
-      FTLCONF_webserver_port: '3008'
-      IPv6: "false"
     volumes:
       - 'pihole:/etc/pihole/'
       - 'dnsmasq.d:/etc/dnsmasq.d/'

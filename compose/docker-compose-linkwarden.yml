@@ -29,8 +29,9 @@ services:
       - "diun.include_tags=latest"
       - homepage.group=Containers
       - homepage.name=Limkwarden
-      - homepage.href=http://limkwarden.lan
+      - homepage.href=http://linkwarden.lan
       - homepage.description=Linkwarden webpage management service
+
 volumes:
   data:
   pgdata:

@@ -9,8 +9,6 @@ services:
     ports:
       - "3009:8000/tcp"
       - "9443:9443/tcp"
-    environment:
-      TZ: 'Europe/London'
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - "portainer_data:/data"

@@ -5,10 +5,6 @@ services:
    image: itzg/minecraft-bedrock-server:latest
    ports:
      - "19132:19132/udp"
-   environment:
-     EULA: "TRUE"
-     GAMEMODE: survival
-     DIFFICULTY: normal
    restart: unless-stopped
    deploy:
      resources:

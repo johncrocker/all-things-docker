@@ -9,8 +9,6 @@ services:
       - "80:80/tcp"
       - "81:81/tcp"
       - "443:443/tcp"
-    environment:
-      TZ: 'Europe/London'
     volumes:
       - "nginx_data:/data"
       - "nginx_letsencrypt:/etc/letsencrypt"

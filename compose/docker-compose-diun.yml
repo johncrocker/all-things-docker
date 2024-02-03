@@ -14,14 +14,18 @@ services:
       - "LOG_LEVEL=info"
       - "LOG_JSON=false"
       - "DIUN_WATCH_WORKERS=20"
-      - "DIUN_WATCH_SCHEDULE=0 3 * * 6"
+      - "DIUN_WATCH_SCHEDULE=5 4 * * 0 "
       - "DIUN_WATCH_JITTER=30s"
       - "DIUN_PROVIDERS_DOCKER=true"
       - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=false"
       - "DIUN_REGOPTS_dockerio_NAME=docker.io"
       - "DIUN_REGOPTS_dockerio_SELECTOR=image"
       - "DIUN_REGOPTS_dockerio_USERNAME=${DOCKER_USERNAME}"
-      - "DIUN_REGOPTS_dockerio_PASSWORD=${DOCKER_PAT}"
+      - "DIUN_REGOPTS_dockerio_PASSWORD+${DOCKER_PAT}"
+      - "DIUN_NOTIF_MATRIX_HOMESERVERURL=${MATRIX_SERVER}"
+      - "DIUN_NOTIF_MATRIX_USER=${MATRIX_USER}"
+      - "DIUN_NOTIF_MATRIX_PASSWORD=${MATRIX_PASSWORD}"
+      - "DIUN_NOTIF_MATRIX_ROOMID=${MATRIX_ROOMID}"
     labels:
       - "diun.enable=true"
       - "diun.watch_repo=true"
@@ -30,4 +34,3 @@ services:
 
 volumes:
   data:
-

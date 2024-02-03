@@ -3,7 +3,6 @@ services:
   postgres:
     container_name: postgres
     image: postgres:alpine
-    env_file: .env
     restart: unless-stopped
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -14,7 +13,6 @@ services:
 
   linkwarden:
     container_name: linkwarden
-    env_file: .env
     environment:
       - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
     restart: unless-stopped

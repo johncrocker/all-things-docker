@@ -1,5 +1,5 @@
 #!/bin/bash
-export DOCKER_ENV="$HOME/docker/environments"
+export DOCKER_ENV="$HOME/docker/environment"
 
 envfile="$DOCKER_ENV/$1.env"
 composefile="$HOME/docker/compose/docker-compose-$1.yml"

@@ -1,0 +1,41 @@
+version "3.3"
+
+services:
+  unifi-network-application:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: unifi-network-application
+    volumes:
+      - config:/config
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Ubiquiti Unifi
+      - homepage.href=https://192.168.1.201:8443
+      - homepage.description=Ubiquiti Unifi Network Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+  unifi-db:
+    image: docker.io/mongo:4.4.19
+    container_name: unifi-db
+    volumes:
+      - db:/data/db
+      - ../../docker-env/mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    restart: unless-stopped
+    labels:
+      - "diun.enable=false"
+
+volumes:
+  config:
+  db:

@@ -34,9 +34,7 @@ services:
       - "mongo_data:/data/db"
       - "config_data:/data/configdb"
     labels:
-      - "diun.enable=true"
-      - "diun.watch_repo=true"
-      - "diun.include_tags=4.4.19"
+      - "diun.enable=false"
 
 volumes:
   mongo_data:

@@ -1,9 +1,9 @@
 version: "3.3"
 
 services:
-  unifi-network-application:
+  unifi:
     image: lscr.io/linuxserver/unifi-network-application:latest
-    container_name: unifiy
+    container_name: unifi
     volumes:
       - config:/config
     ports:

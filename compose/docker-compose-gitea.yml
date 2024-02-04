@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   gitea:
+    env_file:
+      - ${DOCKER_ENV}/gitea.env
     image: gitea/gitea:latest
     restart: unless-stopped
     volumes:
@@ -20,6 +22,8 @@ services:
       - "diun.include_tags=latest"
 
   db:
+    env_file:
+      - ${DOCKER_ENV}/gitea.env
     image: postgres:alpine
     restart: unless-stopped
     volumes:

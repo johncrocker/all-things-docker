@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
  minecraft:
+   env_file:
+     - ${DOCKER_ENV}/minecraft.env
    image: itzg/minecraft-bedrock-server:latest
    ports:
      - "19132:19132/udp"

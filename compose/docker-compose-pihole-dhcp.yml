@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   pihole:
+    env_file:
+      - ${DOCKER_ENV}/pihole.env
     container_name: pihole
     image: pihole/pihole:latest
     hostname: pihole

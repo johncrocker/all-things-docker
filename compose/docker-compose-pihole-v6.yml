@@ -1,8 +1,9 @@
 version: "3.3"
-name: "pihole-stack"
 
 services:
   pihole:
+    env_file:
+      - ${DOCKER_ENV}/pihole-v6.env
     container_name: pihole
     image: pihole/pihole:development-v6
     hostname: piholev6

@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   gogs:
+    env_file:
+      - ${DOCKER_ENV}/gogs.env
     image: gogs/gogs:latest
     container_name: gogs
     restart: unless-stopped
@@ -23,6 +25,8 @@ services:
 
   db:
    image: postgres:alpine
+   env_file:
+     - ${DOCKER_ENV}/gogs.env
    restart: unless-stopped
    volumes:
      - gogs-db-data:/var/lib/postgresql/data

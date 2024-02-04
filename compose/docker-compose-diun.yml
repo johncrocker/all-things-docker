@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   diun:
+    env_file:
+      - ${DOCKER_ENV}/diun.env
     image: crazymax/diun:latest
     command: serve
     hostname: diun

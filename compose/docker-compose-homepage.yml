@@ -1,6 +1,8 @@
 version: "3.3"
 services:
   homepage:
+    env_file:
+      - ${DOCKER_ENV}/homepage.env
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     restart: unless-stopped

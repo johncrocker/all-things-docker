@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   ytdl-ui:
+    env_file:
+      - ${DOCKER_ENV}/youtubedl.env
     restart: unless-stopped
     container_name: ytdl-ui
     depends_on:
@@ -25,6 +27,8 @@ services:
       - "diun.include_tags=latest"
 
   ytdl-mongo-db:
+    env_file:
+      - ${DOCKER_ENV}/youtubedl.env
     image: mongo:4.1.13
     logging:
       driver: "none"

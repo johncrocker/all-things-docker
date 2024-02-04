@@ -2,6 +2,8 @@ version: "3.5"
 services:
   postgres:
     container_name: postgres
+    env_file:
+      - ${DOCKER_ENV}/linkwarden.env
     image: postgres:alpine
     restart: unless-stopped
     volumes:
@@ -13,8 +15,8 @@ services:
 
   linkwarden:
     container_name: linkwarden
-    environment:
-      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+    env_file:
+      - ${DOCKER_ENV}/linkwarden.env
     restart: unless-stopped
     image: ghcr.io/linkwarden/linkwarden:latest
     ports:

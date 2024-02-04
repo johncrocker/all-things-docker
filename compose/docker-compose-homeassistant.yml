@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   homeassistant:
+    env_file:
+      - ${DOCKER_ENV}/homeassistant.env
     container_name: homeassistant
     image: homeassistant/home-assistant:stable
     hostname: homeassistant

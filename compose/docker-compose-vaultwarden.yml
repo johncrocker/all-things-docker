@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   vaultwarden:
+    env_file:
+      - ${DOCKER_ENV}/vaultwarden.env
     image: vaultwarden/server:latest
     container_name: vaultwarden
     restart: unless-stopped

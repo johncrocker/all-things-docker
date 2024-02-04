@@ -31,9 +31,26 @@ then
   echo Using compose file: $composefile
   echo Reading environment from: $envfile
 
-  docker-compose -p $stackname -f $composefile \
-             --env-file $envfile \
-             $cmd $params
+  if [ "$cmd" = "restart" ]
+  then
+
+    docker-compose -p $stackname -f $composefile \
+                   --env-file $envfile \
+                   stop
+
+    echo Waiting 10s second before restart like all good
+    echo Turn it off and on again routines.
+
+    sleep 10s
+
+    docker-compose -p $stackname -f $composefile \
+                   --env-file $envfile \
+                   up -d
+  else
+    docker-compose -p $stackname -f $composefile \
+               --env-file $envfile \
+               $cmd $params
+  fi
 
 else
   echo Cannot find compose file: $composefile

@@ -1,0 +1,43 @@
+#!/bin/bash
+export DOCKER_ENV="$HOME/docker-env"
+
+envfile="$DOCKER_ENV/$1.env"
+composefile="$HOME/docker/compose/docker-compose-$1.yml"
+stackname="$1-stack"
+cmd="$2"
+params=""
+
+if [ ! -z "$3" ]
+then
+  composefile="$HOME/docker/compose/docker-compose-$2.yml"
+  cmd="$3"
+fi
+
+if [ "$cmd" = "up" ]
+then
+  params="-d"
+fi
+
+if [ ! -e "$envfile" ]
+then
+  envfile="$DOCKER_ENV/global.env"
+fi
+
+echo ""
+echo Stack·name:·$stackname
+
+if [ -e "$composefile" ]
+then
+  echo Using compose file: $composefile
+  echo Reading environment from: $envfile
+
+  docker-compose -p $stackname -f $composefile \
+             --env-file $envfile \
+             $cmd $params
+
+else
+  echo Cannot find compose file: $composefile
+  echo Aborting
+fi
+
+echo ""

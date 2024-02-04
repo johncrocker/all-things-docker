@@ -25,7 +25,7 @@ services:
       - "diun.include_tags=latest"
 
   ytdl-mongo-db:
-    image: mongo:4.4.19
+    image: mongo:4.1.13
     logging:
       driver: "none"
     container_name: ytdl-mongo-db

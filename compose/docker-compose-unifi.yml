@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   unifi:
+    env_file:
+      -  ${DOCKER_ENV}/unifi.env
     image: lscr.io/linuxserver/unifi-network-application:latest
     container_name: unifi
     volumes:
@@ -27,7 +29,7 @@ services:
       - "diun.include_tags=latest"
 
   unifi-db:
-    image: docker.io/mongo:4.4.19
+    image: docker.io/mongo:4.1.13
     container_name: unifi-db
     volumes:
       - db:/data/db

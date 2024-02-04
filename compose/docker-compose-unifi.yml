@@ -33,6 +33,7 @@ services:
     container_name: unifi-db
     volumes:
       - db:/data/db
+      - configdb:/data/configdb
       - ../../docker-env/mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     restart: unless-stopped
     labels:
@@ -41,3 +42,4 @@ services:
 volumes:
   config:
   db:
+  configdb:

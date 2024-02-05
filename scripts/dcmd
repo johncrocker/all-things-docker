@@ -1,5 +1,7 @@
 #!/bin/bash
 export DOCKER_ENV="$HOME/docker/environment"
+export PUID="$UID"
+export PGID="$UID"
 
 envfile="$DOCKER_ENV/$1.env"
 composefile="$HOME/docker/compose/docker-compose-$1.yml"

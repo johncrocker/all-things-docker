@@ -1,0 +1,70 @@
+version: "3.3"
+
+services:
+  backend:
+    env_file:
+      - ${DOCKER_ENV}/infisical.env
+    container_name: infisical-backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    image: infisical/infisical:latest
+    env_file:
+      - ${DOCKER_ENV}/infisical.env
+    ports:
+      - 3017:8080
+    environment:
+       - NODE_ENV=production
+    networks:
+      - infisical
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Infisical
+      - homepage.href=https://192.168.1.201:3017
+      - homepage.vdescription=Infisical Secret Store Service
+      - "ndiun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+  redis:
+    image: redis:latest
+    container_name: infisical-dev-redis
+    env_file:
+      - ${DOCKER_ENV}/infisical.env
+    environment:
+        - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6379:6379
+    networks:
+      - infisical
+    volumes:
+      - redis_data:/data
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+  mongo:
+    container_name: infisical-mongo
+    image: mongo:4.1.13
+    restart: unless-stopped
+    env_file:
+      - ${DOCKER_ENV}/infisical.env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - infisical
+    labels:
+      - "diun.enable=false"
+
+volumes:
+  mongo-data:
+     driver: local
+  redis_data:
+    driver: local
+
+networks:
+  infisical:

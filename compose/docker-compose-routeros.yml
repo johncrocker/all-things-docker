@@ -2,22 +2,20 @@ version: "3.3"
 
 services:
   routeros:
-    container_name: "mikrotik"
-    image: cnsoluciones/mikrotik:7.6
+    image: mkv28/mikrotik-routeros:latest
+    restart: unless-stopped
     privileged: true
-    ports:
-      - "2121:21" #ftp
-      - "2222:22" #ssh
-      - "2323:23" #telnet
-      - "8080:80" #www
-      - "4433:443" #www-ssl
-      - "1194:1194" #OVPN
-      - "1450:1450" #L2TP
-      - "8291:8291" #winbox
-      - "8728:8728" #api
-      - "8729:8729" #api-ssl
-      - "13231:13231" #WireGuard
     cap_add:
       - NET_ADMIN
     devices:
       - /dev/net/tun
+    ports:
+      - "2222:22"
+      - "2223:23"
+      - "7777:80"
+      - "8728:8728"
+      - "8729:8729"
+      - "28728:8728"
+      - "28729:8729"
+      - "8291:8291"
+      - "5900:5900"

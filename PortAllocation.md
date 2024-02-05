@@ -32,6 +32,8 @@ Here are the Port Allocations per Container Stack
 | Homeassistant                                         | docker-compose-homeassistant.yml     | 8123 *       |                          |
 | Glances                                               | docker-compose-glances.yml           | 61208, 61209 |                          |      
 | Linkwarden                                            | docker-compose-linkwarden.yml        | 3015         |                          |
+| Infisical                                             | docker-compose-infisical.yml         | 3017         |                          |
+
 
 
 \* Note: Specified by configuration not orchestration

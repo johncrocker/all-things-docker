@@ -34,7 +34,7 @@ services:
     volumes:
       - db:/data/db
       - configdb:/data/configdb
-      - ../../docker-env/mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - "${DOCKER_ENV}/mongo-init.js:/docker-entrypoint-initdb.d/init-mongo.js:ro"
     restart: unless-stopped
     labels:
       - "diun.enable=false"

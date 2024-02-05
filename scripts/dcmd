@@ -49,10 +49,17 @@ then
                    --env-file $envfile \
                    up -d
   else
-    docker-compose -p $stackname -f $composefile \
-               --env-file $envfile \
-               $cmd $params
+   if [ "$cmd" = "debug" ]
+   then
+     docker-compose -p $stackname -f $composefile \
+                 --env-file $envfile \
+                up
+  else
+     docker-compose -p $stackname -f $composefile \
+                 --env-file $envfile \
+                $cmd $params  
   fi
+ fi
 
 else
   echo Cannot find compose file: $composefile

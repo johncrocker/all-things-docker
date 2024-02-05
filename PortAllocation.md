@@ -31,11 +31,11 @@ Here are the Port Allocations per Container Stack
 | Neo4J                                                 | docker-compose-neo4j.yml             | 7474         | 7687                     |
 | Homeassistant                                         | docker-compose-homeassistant.yml     | 8123 *       |                          |
 | Glances                                               | docker-compose-glances.yml           | 61208, 61209 |                          |      
-| Linkwarden                                            | docker-compose-linkwarden.yml        | 3015         |                          |
+| Linkwarddzen                                          | docker-compose-linkwarden.yml        | 3015         |                          |
 | Infisical                                             | docker-compose-infisical.yml         | 3017         |                          |
 | OpenHAB.                                              | docker-compose-openhab.yml.          | 3018, 3019   |                          |
+| UniFi Comsolexx                                       | docker-compose-unifi.yml             | 3020         | 3678, 10001, 8080, 1900,8443, 8880, 6789, 5514 |
 
 
-
-\* Note: Specified by configuration not orchestration
+\* Note: Specified by configuration
 

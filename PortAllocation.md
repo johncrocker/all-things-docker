@@ -33,6 +33,7 @@ Here are the Port Allocations per Container Stack
 | Glances                                               | docker-compose-glances.yml           | 61208, 61209 |                          |      
 | Linkwarden                                            | docker-compose-linkwarden.yml        | 3015         |                          |
 | Infisical                                             | docker-compose-infisical.yml         | 3017         |                          |
+| OpenHAB.                                              | docker-compose-openhab.yml.          | 3018, 3019   |                          |
 
 
 

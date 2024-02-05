@@ -1,4 +1,4 @@
-#version: "3.3"
+version: "3.3"
 
 services:
   openhab:
@@ -14,7 +14,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
       - homepage.group=Containers
       - homepage.name=OpenHAB
-      - homepage.href=http://pihole.lan/admin/
+      - homepage.href=http://openhab.lan
       - homepage.description=OpenHAB Home Automation Service
       - "diun.enable=true"
       - "diun.watch_repo=true"

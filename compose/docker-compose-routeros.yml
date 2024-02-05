@@ -2,6 +2,7 @@ version: "3.3"
 
 services:
   routeros:
+    container_name: "mikrotik"
     image: mkv28/mikrotik-routeros:latest
     restart: unless-stopped
     privileged: true

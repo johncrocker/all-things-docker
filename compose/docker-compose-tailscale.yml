@@ -12,8 +12,8 @@ services:
       - NET_ADMIN
       - NET_RAW
     environment:
-      - "TS_STATE_DIR=/var/lib/tailscale"
-      - "TS_USERSPACE=0"
+      - TS_STATE_DIR="/var/lib/tailscale"
+      - TS_AUTHKEY="${TS_AUTHKEY}""
     volumes:
       - "data:/var/lib/tailscale"
     privileged: true

@@ -1,0 +1,33 @@
+version: "3.3"
+
+services:
+  tailscale:
+    env_file:
+      - ${DOCKER_ENV}/tailscale.env
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    restart: always
+    network_mode: "host"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+      - "TS_STATE_DIR=/var/lib/tailscale"
+      - "TS_USERSPACE=0"
+    volumes:
+      - "data:/var/lib/tailscale"
+    privileged: true
+    devices:
+      - /dev/net/tun
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Tailscale
+      - homepage.href=https://login.tailscale.com/admin
+      - homepage.description=Tailscale Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - "com.centurylinklabs.watchtower.enable=false"
+
+volumes:
+  data:

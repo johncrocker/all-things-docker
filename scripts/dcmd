@@ -40,9 +40,8 @@ then
   echo Using compose file: $composefile
   echo Reading environment from: $envfile
 
-  if [ "$cmd" = "restart" ]
-  then
-
+  case $cmd in
+   restart)
     docker-compose -p $stackname -f $composefile \
                    --env-file $envfile \
                    stop
@@ -54,19 +53,24 @@ then
 
     docker-compose -p $stackname -f $composefile \
                    --env-file $envfile \
-                   up -d
-  else
-   if [ "$cmd" = "debug" ]
-   then
+                   up -d ;;
+  debug)
      docker-compose -p $stackname -f $composefile \
                  --env-file $envfile \
-                up
-  else
+                up ;;
+  nuke)
+    docker-compose -p $stackname -f $composefile \
+                --env-file $envfile \
+                stop
+
+    docker-compose -p $stackname -f $composefile \
+                --env-file $envfile \
+                rm ;;
+  *)
      docker-compose -p $stackname -f $composefile \
                  --env-file $envfile \
-                $cmd $params  
-  fi
- fi
+                $cmd $params ;;
+  esac
 
 else
   echo Cannot find compose file: $composefile

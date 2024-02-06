@@ -1,9 +1,11 @@
 #!/bin/bash
 export DOCKER_ENV="$HOME/docker/environment"
+export DOCKER_PRIV_ENV="$HOME/docker-private"
 export PUID="$UID"
 export PGID="$UID"
 
 envfile="$DOCKER_ENV/$1.env"
+privenvfile="$DOCKER_PRIV_ENV/$1.env"
 composefile="$HOME/docker/compose/docker-compose-$1.yml"
 stackname="$1-stack"
 cmd="$2"
@@ -23,6 +25,11 @@ fi
 if [ ! -e "$envfile" ]
 then
   envfile="$DOCKER_ENV/global.env"
+fi
+
+if [ -e "$privenvfile" ]
+then
+  envfile="$privenvfile"
 fi
 
 echo ""

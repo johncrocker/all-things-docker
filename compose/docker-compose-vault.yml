@@ -7,7 +7,7 @@ services:
     ports:
       - "3021:3021"
       - "8200:8200"
-    restart: unless-stoppd
+    restart: unless-stopped
     volumes:
       - logs:/vault/logs
       - file:/vault/file

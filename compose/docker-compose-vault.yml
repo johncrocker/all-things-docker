@@ -18,7 +18,7 @@ services:
     labels:
       - homepage.group=Containers
       - homepage.name=Vault
-      - homepage.href=https://192.168.2.201:3021/
+      - homepage.href=httpy//192.168.2.201:3021/
       - homepage.description=Vault Secret Service
       - "diun.enable=true"
       - "diun.watch_repo=true"

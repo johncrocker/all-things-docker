@@ -42,10 +42,16 @@ then
 
   case $cmd in
    ip)
+    echo ""
     for containerid in $(docker-compose -p $stackname -f $composefile --env-file $envfile ps -q);
     do
      ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
      containername=$(docker inspect -f "{{.Name}}" $containerid)
+
+       if [ "$ipaddress" = "" ]
+       then
+         ipaddress="0.0.0.0"
+       fi
 
      echo $containername  =  $ipaddress
     done

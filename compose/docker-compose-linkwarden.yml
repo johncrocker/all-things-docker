@@ -17,6 +17,8 @@ services:
     container_name: linkwarden
     env_file:
       - ${DOCKER_ENV}/linkwarden.env
+    environment:
+     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
     restart: unless-stopped
     image: ghcr.io/linkwarden/linkwarden:latest
     ports:

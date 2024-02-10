@@ -5,12 +5,12 @@ services:
     env_file:
       - ${DOCKER_ENV}/homeassistant.env
     container_name: homeassistant
-    image: homeassistant/home-assistant:stable
+    image: homeassistant/home-assistant:latest
     hostname: homeassistant
     privileged: true
     network_mode: "host"
     volumes:
-      - 'hass_config:/config'
+      - 'config:/config'
       - '/run/dbus:/run/dbus:ro'
       - '/etc/localtime:/etc/localtime:ro'
     restart: unless-stopped
@@ -18,11 +18,10 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
       - homepage.group=Containers
       - homepage.name=Homeassistant
-      - homepage.href=http://192.168.1.201:8123/
+      - homepage.href=http://homeassistant.lan
       - homepage.description=Homeassistant Manager Service
       - "diun.enable=true"
-      - "diun.watch_repo=true"
-      - "diun.include_tags=stable"
+      - "diun.watch_repo=peteer"
 
 volumes:
-  hass_config:
+  config:

@@ -46,19 +46,20 @@ then
   case $cmd in
    ip)
     echo ""
+    printf "%-20s %s\n" "ADDRESS" "CONTAINER"
+
     for containerid in $(docker-compose -p $stackname -f $composefile --env-file $envfile ps -q);
     do
      ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
      containername=$(docker inspect -f "{{.Name}}" $containerid)
 
        if [ "$ipaddress" = "" ]
-       then
+	       then
          ipaddress="0.0.0.0"
        fi
 
-     echo $containername  =  $ipaddress
+     printf "%-20s %s\n" $ipaddress $containername
     done
-
     echo "" ;;
    restart)
     docker-compose -p $stackname -f $composefile \

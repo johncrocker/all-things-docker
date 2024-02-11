@@ -4,12 +4,15 @@ export DOCKER_PRIV_ENV="$HOME/docker-private"
 export PUID="$UID"
 export PGID="$UID"
 
+globalenvfile="$DOCKER_ENV/global.env"
 envfile="$DOCKER_ENV/$1.env"
 privenvfile="$DOCKER_PRIV_ENV/$1.env"
 composefile="$HOME/docker/compose/docker-compose-$1.yml"
 stackname="$1-stack"
 cmd="$2"
 params=""
+
+export $(xargs < $globalenvfile) 
 
 if [ ! -z "$3" ]
 then
@@ -24,7 +27,7 @@ fi
 
 if [ ! -e "$envfile" ]
 then
-  envfile="$DOCKER_ENV/global.env"
+  envfile="$globalenvfile"
 fi
 
 if [ -e "$privenvfile" ]

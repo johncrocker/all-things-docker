@@ -33,18 +33,19 @@ then
   if [ -e "$globalenvfile" ]
   then
     echo Reading Global Environment from: $globalenvfile
-    export $(xargs < $globalenvfile)
+    set -a ; source $globalenvfile ; set +a
   fi
 
   if [ -e "$envfile" ]
   then
     echo Reading environment from: $envfile
-    export $(xargs < $envfile)
+    set -a ; source $envfile ; set +a
   fi
+
   if [ -e "$privenvfile" ]
   then
     echo Reading Private Environment from: $privenvfile
-    export $(xargs < $privenvfile)
+    set -a ; source $privenvfile ; set +a
   fi
 
   case $cmd in

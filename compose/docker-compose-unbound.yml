@@ -2,6 +2,8 @@ version: "3.3"
 
 services:
   unbound-dns-a:
+    environment:
+      - TZ=${TZ}
     restart: unless-stopped
     container_name: unbound-dns-a
     image: cdrocker/unbound:latest
@@ -19,6 +21,8 @@ services:
       - "diun.include_tags=latest"
 
   unbound-dns-b:
+    environment:
+      - TZ=${TZ}
     restart: unless-stopped
     container_name: unbound-dns-b
     image: cdrocker/unbound:latest

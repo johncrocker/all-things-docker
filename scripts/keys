@@ -1,0 +1,101 @@
+#!/bin/bash
+export DOCKER_ENV="$HOME/docker/environment"
+export DOCKER_PRIV_ENV="$HOME/docker-private"
+
+export DOCKER_GATEWAY_HOST=$(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print $3}')
+export PUID="$UID"
+export PGID="$UID"
+
+globalenvfile="$DOCKER_ENV/global.env"
+envfile="$DOCKER_ENV/$1.env"
+privenvfile="$DOCKER_PRIV_ENV/$1.env"
+composefile="$HOME/docker/compose/docker-compose-$1.yml"
+stackname="$1-stack"
+cmd="$2"
+params=""
+
+if [ ! -z "$3" ]
+then
+  composefile="$HOME/docker/compose/docker-compose-$2.yml"
+  cmd="$3"
+fi
+
+if [ "$cmd" = "up" ]
+then
+  params="-d"
+fi
+
+echo ""
+echo Stack·name:·$stackname
+
+if [ -e "$composefile" ]
+then
+  echo Using compose file: $composefile
+
+  if [ -e "$globalenvfile" ]
+  then
+    echo Reading Global Environment from: $globalenvfile
+    set -a ; source $globalenvfile ; set +a
+  fi
+
+  if [ -e "$envfile" ]
+  then
+    echo Reading environment from: $envfile
+    set -a ; source $envfile ; set +a
+  fi
+
+  if [ -e "$privenvfile" ]
+  then
+    echo Reading Private Environment from: $privenvfile
+    set -a ; source $privenvfile ; set +a
+  fi
+
+  case $cmd in
+   ip)
+    echo ""
+    printf "%-20s %s\n" "ADDRESS" "CONTAINER"
+
+    for containerid in $(docker-compose -p $stackname -f $composefile ps -q);
+    do
+     ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
+     containername=$(docker inspect -f "{{.Name}}" $containerid)
+
+       if [ "$ipaddress" = "" ]
+	       then
+         ipaddress="0.0.0.0"
+       fi
+
+     printf "%-20s %s\n" $ipaddress $containername
+    done
+    echo "" ;;
+   restart)
+    docker-compose -p $stackname -f $composefile \
+                   stop
+
+    echo Waiting 10s second before restart like all good
+    echo Turn it off and on again routines.
+
+    sleep 10s
+
+    docker-compose -p $stackname -f $composefile \
+                   up -d ;;
+  debug)
+     docker-compose -p $stackname -f $composefile \
+                up ;;
+  nuke)
+    docker-compose -p $stackname -f $composefile \
+                stop
+
+    docker-compose -p $stackname -f $composefile \
+                rm ;;
+  *)
+     docker-compose -p $stackname -f $composefile \
+                $cmd $params ;;
+  esac
+
+else
+  echo Cannot find compose file: $composefile
+  echo Aborting
+fi
+
+echo ""

@@ -72,11 +72,6 @@ then
     docker-compose -p $stackname -f $composefile \
                    stop
 
-    echo Waiting 10s second before restart like all good
-    echo Turn it off and on again routines.
-
-    sleep 10s
-
     docker-compose -p $stackname -f $composefile \
                    up -d ;;
   debug)

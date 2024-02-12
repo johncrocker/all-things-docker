@@ -1,0 +1,31 @@
+version: "3.3"
+services:
+  eufyws:
+#/    env_file:
+#      - ${DOCKER_ENV}/eufyws.env
+    image: bropat/eufy-security-ws:latest
+    container_name: eufyws
+    restart: unless-stopped
+    ports:
+      - 2999:2999
+    privileged: true
+    environment:
+      - TZ=Europe/London
+      - USERNAME=${USERNAME}
+      - PASSWORD=${PASSWORD}
+      - PORT=${PORT}
+      - COUNTRY=${COUNTRY}
+    volumes:
+      - eufyws_data:/data/
+    labels:
+      - homepage.group=Containers
+      - homepage.name=eufyws
+      - homepage.href=http://192.168.1.201:1984/
+      - homepage.description=eufyws Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  eufyws_data:
+

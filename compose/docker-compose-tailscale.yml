@@ -15,6 +15,7 @@ services:
     devices:
       - /dev/net/tun
     environment:
+      - TZ=${TZ}
       - TS_AUTHKEY=${TAILSCALE_TS_AUTHKEY}
       - TS_HOSTNAME=${TAILSCALE_TS_HOSTNAME}
       - TS_ROUTES=${TAILSCALE_TS_ROUTES}

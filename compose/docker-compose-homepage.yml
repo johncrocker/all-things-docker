@@ -1,8 +1,14 @@
 version: "3.3"
 services:
   homepage:
-    env_file:
-      - ${DOCKER_ENV}/homepage.env
+    environment:
+      - TZ=${TZ}
+      - PUID=${HOMEPAGE_PUID}
+      - PGID=${HOMEPAGE_PGID}
+      - CONTAINERS=${HOMEPAGE_CONTAINERS}
+      - SERVICES=${HOMEPAGE_SERVICES}
+      - TASKS=${HOMEPAGE_TASKS}
+      - POST=${HOMEPAGE_POST}
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     restart: unless-stopped

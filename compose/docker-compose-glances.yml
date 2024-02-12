@@ -4,6 +4,8 @@ services:
   glances:
     image: nicolargo/glances:latest
     container_name: glances
+    environment:
+      - TZ=${TZ}
     restart: unless-stopped
     ports:
       - "61208:61208"

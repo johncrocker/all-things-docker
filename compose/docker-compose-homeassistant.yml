@@ -2,8 +2,9 @@ version: "3.3"
 
 services:
   homeassistant:
-    env_file:
-      - ${DOCKER_ENV}/homeassistant.env
+    environment:
+      - TZ=${TZ}
+      - DISABLE_JEMALLOC=${HOMEASSISTANT_DISABLE_JEMALLOC}
     container_name: homeassistant
     image: homeassistant/home-assistant:latest
     hostname: homeassistant

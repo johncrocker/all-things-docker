@@ -6,6 +6,8 @@ services:
     restart: unless-stopped
     init: true
     container_name: openvscode
+    environment:
+      - TZ=${TZ}
     ports:
       - "3006:3000"
     volumes:

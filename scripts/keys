@@ -6,11 +6,14 @@ export DOCKER_GATEWAY_HOST=$(ip addr show dev eth0 | grep 'state UP' -A2 | tail 
 export PUID="$UID"
 export PGID="$UID"
 
+projectid="${1^^}_"
+
 function getkeys()
 {
   while IFS='=' read -r key value
   do
-    echo "      - $key="
+    dkey="$projectid"
+    echo "      - ${key#${projectid}}=\${$key}"
   done < "$1"
 }
 
@@ -19,8 +22,8 @@ envfile="$DOCKER_ENV/$1.env"
 privenvfile="$DOCKER_PRIV_ENV/$1.env"
 composefile="$HOME/docker/compose/docker-compose-$1.yml"
 stackname="$1-stack"
-
-echo "   environment:"
+   
+echo "    environment:"
 
   if [ -e "$globalenvfile" ]
   then
@@ -37,15 +40,3 @@ echo "   environment:"
     getkeys "$privenvfile"
   fi
 
-
-
-function getkeys(filename)
-{
-  while IFS='=' read -r key value
-  do
-    echo "      - $key="
-    key=$(echo $key | tr '.' '_')
-    eval ${key}=\${value}
-  done < "$filename"
-}
-p

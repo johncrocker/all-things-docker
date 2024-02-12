@@ -12,8 +12,6 @@ stackname="$1-stack"
 cmd="$2"
 params=""
 
-export $(xargs < $globalenvfile) 
-
 if [ ! -z "$3" ]
 then
   composefile="$HOME/docker/compose/docker-compose-$2.yml"
@@ -25,30 +23,36 @@ then
   params="-d"
 fi
 
-if [ ! -e "$envfile" ]
-then
-  envfile="$globalenvfile"
-fi
-
-if [ -e "$privenvfile" ]
-then
-  envfile="$privenvfile"
-fi
-
 echo ""
 echo Stack·name:·$stackname
 
 if [ -e "$composefile" ]
 then
   echo Using compose file: $composefile
-  echo Reading environment from: $envfile
+
+  if [ -e "$globalenvfile" ]
+  then
+    echo Reading Global Environment from: $globalenvfile
+    export $(xargs < $globalenvfile)
+  fi
+
+  if [ -e "$envfile" ]
+  then
+    echo Reading environment from: $envfile
+    export $(xargs < $envfile)
+  fi
+  if [ -e "$privenvfile" ]
+  then
+    echo Reading Private Environment from: $privenvfile
+    export $(xargs < $privenvfile)
+  fi
 
   case $cmd in
    ip)
     echo ""
     printf "%-20s %s\n" "ADDRESS" "CONTAINER"
 
-    for containerid in $(docker-compose -p $stackname -f $composefile --env-file $envfile ps -q);
+    for containerid in $(docker-compose -p $stackname -f $composefile ps -q);
     do
      ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
      containername=$(docker inspect -f "{{.Name}}" $containerid)
@@ -63,7 +67,6 @@ then
     echo "" ;;
    restart)
     docker-compose -p $stackname -f $composefile \
-                   --env-file $envfile \
                    stop
 
     echo Waiting 10s second before restart like all good
@@ -72,23 +75,18 @@ then
     sleep 10s
 
     docker-compose -p $stackname -f $composefile \
-                   --env-file $envfile \
                    up -d ;;
   debug)
      docker-compose -p $stackname -f $composefile \
-                 --env-file $envfile \
                 up ;;
   nuke)
     docker-compose -p $stackname -f $composefile \
-                --env-file $envfile \
                 stop
 
     docker-compose -p $stackname -f $composefile \
-                --env-file $envfile \
                 rm ;;
   *)
      docker-compose -p $stackname -f $composefile \
-                 --env-file $envfile \
                 $cmd $params ;;
   esac
 

@@ -1,8 +1,6 @@
 version: "3.3"
 services:
   eufyws:
-#/    env_file:
-#      - ${DOCKER_ENV}/eufyws.env
     image: bropat/eufy-security-ws:latest
     container_name: eufyws
     restart: unless-stopped
@@ -11,10 +9,10 @@ services:
     privileged: true
     environment:
       - TZ=Europe/London
-      - USERNAME=${USERNAME}
-      - PASSWORD=${PASSWORD}
-      - PORT=${PORT}
-      - COUNTRY=${COUNTRY}
+      - USERNAME=${EUFYWS_USERNAME}
+      - PASSWORD=${EUFYWS_PASSWORD}
+      - PORT=${EUFYWS_PORT}
+      - COUNTRY=${EUFYWS_COUNTRY}
     volumes:
       - eufyws_data:/data/
     labels:

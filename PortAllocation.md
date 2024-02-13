@@ -35,7 +35,7 @@ Here are the Port Allocations per Container Stack
 | Infisical                                             | docker-compose-infisical.yml         | 3017         |                          |
 | OpenHAB.                                              | docker-compose-openhab.yml.          | 3018, 3019   |                          |
 | UniFi Comsole                                         | docker-compose-unifi.yml             | 3020         | 3678, 10001, 8080, 1900,8443, 8880, 6789, 5514 |
-
+| Dashy                                                 | docker-compose-dashy.yml             | 3022         |                          |
 
 \* Note: Specified by configuration
 

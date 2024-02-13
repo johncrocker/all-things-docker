@@ -1,0 +1,17 @@
+#!/bin/bash 
+
+fronver="version: $1"
+tover="version: $2 "
+
+for filename in docker-compose*.yml
+do
+  [ -e "$filename" ] || continue
+
+  echo "$filename"
+
+  while IFS='' read -r a; do
+    echo "${a//$fromver/$tover}"
+  done < "$filename" > "$filename.t"
+  mv "$filename{.t,}"
+
+done

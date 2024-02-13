@@ -4,8 +4,7 @@ services:
     image: bropat/eufy-security-ws:latest
     container_name: eufyws
     restart: unless-stopped
-    ports:
-      - 2999:2999
+    network_mode: host
     privileged: true
     environment:
       - TZ=Europe/London

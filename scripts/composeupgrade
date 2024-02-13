@@ -1,7 +1,10 @@
-#!/bin/bash 
+#!/bin/bash
 
-fronver="version: $1"
-tover="version: $2 "
+fromver="version: \"$1\""
+tover="version: \"$2\""
+
+echo "Moving from $fromver to $tover"
+echo ""
 
 for filename in docker-compose*.yml
 do
@@ -12,6 +15,6 @@ do
   while IFS='' read -r a; do
     echo "${a//$fromver/$tover}"
   done < "$filename" > "$filename.t"
-  mv "$filename{.t,}"
+  mv "$filename.t" "$filemame"
 
 done

@@ -6,6 +6,7 @@ tover="version: \"$2\""
 echo "Moving from $fromver to $tover"
 echo ""
 
+
 for filename in docker-compose*.yml
 do
   [ -e "$filename" ] || continue
@@ -15,6 +16,5 @@ do
   while IFS='' read -r a; do
     echo "${a//$fromver/$tover}"
   done < "$filename" > "$filename.t"
-  mv "$filename.t" "$filemame"
-
+  mv "$filename.t" "$filename"
 done

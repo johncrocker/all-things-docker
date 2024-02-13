@@ -77,12 +77,30 @@ then
   debug)
      docker-compose -p $stackname -f $composefile \
                 up ;;
-  nuke)
+  rm)
     docker-compose -p $stackname -f $composefile \
                 stop
 
     docker-compose -p $stackname -f $composefile \
                 rm ;;
+  del)
+    echo "CAUTION: This deletes everything relatd to this stack"
+    echo "(Volumes, Contaimers, Images, Networks etc)"
+    echo "Are you sure?"
+
+    select yn in "Yes" "No"; do
+      case $yn in
+        Yes) docker-compose -p $stackname -f $composefile \
+                         down -v --rmi all
+             echo "Deleted"
+             exit;;
+      No) echo "Aborting"
+            echo ""
+            exit;;
+      esac
+    done
+
+    echo "";;
   *)
      docker-compose -p $stackname -f $composefile \
                 $cmd $params ;;

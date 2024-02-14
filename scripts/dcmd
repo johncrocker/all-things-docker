@@ -1,21 +1,85 @@
 #!/bin/bash
 
-function echoerr() { printf "%s\n" "$*" >&2; }
-function echoinfo() { printf "%s\n" "$*" >&2; }
-function loadenvfile() {
-  envfile="$1"
-  if [ -e "$envfile" ]; then
-    echoinfo "Reading Enfironmemt file: $envfile"
-    set -a
-    source "$envfile"
-    set +a
- fi
+function echoerr() {
+	printf "%s\n" "$*" >&2
 }
 
+function echoinfo() {
+	printf "%s\n" "$*" >&2
+}
+
+function loadenvfile() {
+	envfile="$1"
+	if [ -e "$envfile" ]; then
+		echoinfo "Reading Enfironmemt file: $envfile"
+		set -a
+		source "$envfile"
+		set +a
+	fi
+}
+
+function dockercompose() {
+	docker-compose -p $1 -f $2 $3 $4
+}
+
+function listcontainerips {
+	echo ""
+	printf "%-20s %s\n" "ADDRESS" "CONTAINER"
+
+	for containerid in $(docker-compose -p $1 -f $2 ps -q); do
+		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
+		containername=$(docker inspect -f "{{.Name}}" $containerid)
+
+
+		if [ "$ipaddress" = "" ]; then
+			ipaddress="0.0.0.0"
+		fi
+
+		printf "%-20s %s\n" $ipaddress $containername
+	done
+	echo ""
+}
+
+function restartcontainers {
+	docker-compose -p $1 -f $2 stop
+	docker-compose -p $1 -f $2 up -d
+}
+
+function debugcontainers {
+	docker-compose -p $1 -f $2 up
+}
+
+function removecontainers {
+	docker-compose -p $1 -f $2 stop
+	docker-compose -p $1 -f $2 rm
+}
+
+function murdercontaimers {
+	echo "CAUTION: This deletes everything relatd to this stack"
+	echo "(Volumes, Contaimers, Images, Networks etc)"
+	echo "Are you sure?"
+
+	select yn in "Yes" "No"; do
+		case $yn in
+		Yes)
+			docker-compose -p $1 -f $2 down -v --rmi all
+			echo "Deleted"
+			exit 0
+			;;
+		Nochx)
+			echo "Aborting"
+			echo ""
+			exit 0
+			;;
+		esac
+	done
+
+	echo ""
+}
 
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
-        echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
-        exit 1
+	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
+	exit 1
 fi
 
 if [ "$DOCKER_ENV" = "" ]; then
@@ -60,91 +124,28 @@ echoinfo "Stack·name:·$stackname"
 if [ -e "$composefile" ]; then
 	echoinfo "Using compose file: $composefile"
 
-        loadenvfile "$DOCKER_ENV/global.env"
-        loadenvfile "$DOCKER_ENV/$project.env"
-        loadenvfile "$DOCKER_SECRET_ENV/$project.env"
-
-	function listcontainerips {
-		echo ""
-		printf "%-20s %s\n" "ADDRESS" "CONTAINER"
-
-		for containerid in $(docker-compose -p $stackname -f $composefile ps -q); do
-			ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
-			containername=$(docker inspect -f "{{.Name}}" $containerid)
-
-			if [ "$ipaddress" = "" ]; then
-				ipaddress="0.0.0.0"
-			fi
-
-			printf "%-20s %s\n" $ipaddress $containername
-		done
-		echo ""
-	}
-
-	function restartcontainers {
-		docker-compose -p $stackname -f $composefile \
-			stop
-
-		docker-compose -p $stackname -f $composefile \
-			up -d
-	}
-
-	function debugcontainers {
-		docker-compose -p $stackname -f $composefile \
-			up
-	}
-
-	function removecontainers {
-		docker-compose -p $stackname -f $composefile stop
-		docker-compose -p $stackname -f $composefile rm
-	}
-
-	function murdercontaimers {
-		echo "CAUTION: This deletes everything relatd to this stack"
-		echo "(Volumes, Contaimers, Images, Networks etc)"
-		echo "Are you sure?"
-
-		select yn in "Yes" "No"; do
-			case $yn in
-			Yes)
-				docker-compose -p $stackname -f $composefile \
-					down -v --rmi all
-				echo "Deleted"
-				exit 0
-				;;
-			Nochx)
-				echo "Aborting"
-				echo ""
-				exit 0
-				;;
-			esac
-		done
-
-		echo ""
-	}
-
-	function dockercompose() {
-		docker-compose -p $stackname -f $composefile $cmd $paams
-	}
+	loadenvfile "$DOCKER_ENV/global.env"
+	loadenvfile "$DOCKER_ENV/$project.env"
+	loadenvfile "$DOCKER_SECRET_ENV/$project.env"
 
 	case $cmd in
 	ip)
-		listcontainerips
+		listcontainerips $stackname $composefile
 		;;
 	restart)
-		restartcontainers
+		restartcontainers $stackname $composefile
 		;;
 	debug)
-		debugcontainers
+		debugcontainers $stackname $composefile
 		;;
 	rmw)
-		removecontainers
+		removecontainers $stackname $composefile
 		;;
 	murder)
-		murdercontainer
+		murdercontainer $stackname $composefile
 		;;
 	*)
-		dockercompose
+		dockercompose $stackname $composefile $cmd $params
 		;;
 	esac
 

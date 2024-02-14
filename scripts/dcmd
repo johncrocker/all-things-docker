@@ -23,7 +23,7 @@ function dockercompose() {
 }
 
 function listcontainerips {
-	echo ""
+
 	printf "%-20s %s\n" "ADDRESS" "CONTAINER"
 
 	for containerid in $(docker-compose -p $1 -f $2 ps -q); do
@@ -36,7 +36,6 @@ function listcontainerips {
 
 		printf "%-20s %s\n" $ipaddress $containername
 	done
-	echo ""
 }
 
 function restartcontainers {
@@ -67,13 +66,11 @@ function murdercontaimers {
 			;;
 		Nochx)
 			echo "Aborting"
-			echo ""
 			exit 0
 			;;
 		esac
 	done
 
-	echo ""
 }
 
 function echoenvfile() {
@@ -134,7 +131,6 @@ if [ "$cmd" = "up" ]; then
 	params="-d"
 fi
 
-echo ""
 echoinfo "Stack·name:·$stackname"
 
 if [ -e "$composefile" ]; then
@@ -143,6 +139,7 @@ if [ -e "$composefile" ]; then
 	loadenvfile "$DOCKER_ENV/global.env"
 	loadenvfile "$DOCKER_ENV/$project.env"
 	loadenvfile "$DOCKER_SECRET_ENV/$project.env"
+        echoinfo ""
 
 	case $cmd in
 	ip)
@@ -174,4 +171,5 @@ else
 	exit 1
 fi
 
-echo ""
+echoinfo ""
+

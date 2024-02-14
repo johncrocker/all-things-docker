@@ -1,8 +1,22 @@
 #!/bin/bash
 
-echoerr() { printf "%s\n" "$*" >&2; }
-echoinfo() { printf "%s\n" "$*" >&2; }
+function echoerr() { printf "%s\n" "$*" >&2; }
+function echoinfo() { printf "%s\n" "$*" >&2; }
+function loadenvfile() {
+  envfile="$1"
+  if [ -e "$envfile" ]; then
+    echoinfo "Reading Enfironmemt file: $envfile"
+    set -a
+    source "$envfile"
+    set +a
+ fi
+}
 
+
+if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
+        echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
+        exit 1
+fi
 
 if [ "$DOCKER_ENV" = "" ]; then
 	echoerr "CRITICAL: Environment varable DOCKER_ENV must be set to the folder containing the environnent files  used. Please resolve."
@@ -18,15 +32,13 @@ export DOCKER_GATEWAY_HOST=$(ip addr show dev eth0 | grep 'state UP' -A2 | tail 
 export PUID="$UID"
 export PGID="$UID"
 
-globalenvfile="$DOCKER_ENV/global.env"
-envfile="$DOCKER_ENV/$1.env"
-privenvfile="$DOCKER_SECRET_ENV/$1.env"
-composefile="$HOME/docker/compose/docker-compose-$1.yml"
-stackname="$1-stack"
+project="$1"
+composefile="$DOCKER_COMPOSE_FOLDER/docker-compose-$project.yml"
+stackname="$project-stack"
 cmd="$2"
 params=""
 
-if [ "$1" = "" ]; then
+if [ "$project" = "" ]; then
 	echoerr "ERROR: Parameter <<stackname>> not specified"
 	echoerr ""
 	echoerr "Format: dcmd <<stackname>> <<command>>"
@@ -34,7 +46,7 @@ if [ "$1" = "" ]; then
 fi
 
 if [ ! -z "$3" ]; then
-	composefile="$HOME/docker/compose/docker-compose-$2.yml"
+	composefile="$DOCKER_COMPOSE_FOLDER/docker-compose-$2.yml"
 	cmd="$3"
 fi
 
@@ -43,31 +55,14 @@ if [ "$cmd" = "up" ]; then
 fi
 
 echo ""
-echoinfo Stack·name:·$stackname
+echoinfo "Stack·name:·$stackname"
 
 if [ -e "$composefile" ]; then
-	echoinfo Using compose file: $composefile
+	echoinfo "Using compose file: $composefile"
 
-	if [ -e "$globalenvfile" ]; then
-		echoinfo Reading Global Environment from: $globalenvfile
-		set -a
-		source "$globalenvfile"
-		set +a
-	fi
-
-	if [ -e "$envfile" ]; then
-		echoinfo Reading environment from: $envfile
-		set -a
-		source "$envfile"
-		set +a
-	fi
-
-	if [ -e "$privenvfile" ]; then
-		echoinfo Reading Private Environment from: $privenvfile
-		set -a
-		source "$privenvfile"
-		set +a
-	fi
+        loadenvfile "$DOCKER_ENV/global.env"
+        loadenvfile "$DOCKER_ENV/$project.env"
+        loadenvfile "$DOCKER_SECRET_ENV/$project.env"
 
 	function listcontainerips {
 		echo ""

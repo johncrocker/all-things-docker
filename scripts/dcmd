@@ -1,15 +1,13 @@
 #!/bin/bash
 
-if [ "$DOCKER_ENV" = "" ]
-then
-  echo "CRITICAL: Environment varable DOCKER_ENV must be set to the folder containing the environnent files  used. Please resolve."
-  exit 1
+if [ "$DOCKER_ENV" = "" ]; then
+	echo "CRITICAL: Environment varable DOCKER_ENV must be set to the folder containing the environnent files  used. Please resolve."
+	exit 1
 fi
 
-if [ "$DOCKER_SECRET_ENV" = "" ]
-then
-  echo "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the folder containing the secret files used. Please resolve."
-  exit 1
+if [ "$DOCKER_SECRET_ENV" = "" ]; then
+	echo "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the folder containing the secret files used. Please resolve."
+	exit 1
 fi
 
 export DOCKER_GATEWAY_HOST=$(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print $3}')
@@ -24,134 +22,137 @@ stackname="$1-stack"
 cmd="$2"
 params=""
 
-if [ "$1" = "" ]
-then
-  echo "ERROR: Parameter <<stackname>> not specified"
-  echo ""
-  echo "Format: dcmd <<stackname>> <<command>>"
-  exit 1
+if [ "$1" = "" ]; then
+	echo "ERROR: Parameter <<stackname>> not specified"
+	echo ""
+	echo "Format: dcmd <<stackname>> <<command>>"
+	exit 1
 fi
 
-if [ ! -z "$3" ]
-then
-  composefile="$HOME/docker/compose/docker-compose-$2.yml"
-  cmd="$3"
+if [ ! -z "$3" ]; then
+	composefile="$HOME/docker/compose/docker-compose-$2.yml"
+	cmd="$3"
 fi
 
-if [ "$cmd" = "up" ]
-then
-  params="-d"
+if [ "$cmd" = "up" ]; then
+	params="-d"
 fi
 
 echo ""
 echo Stack·name:·$stackname
 
-if [ -e "$composefile" ]
-then
-  echo Using compose file: $composefile
+if [ -e "$composefile" ]; then
+	echo Using compose file: $composefile
 
-  if [ -e "$globalenvfile" ]
-  then
-    echo Reading Global Environment from: $globalenvfile
-    set -a ; source "$globalenvfile" ; set +a
-  fi
+	if [ -e "$globalenvfile" ]; then
+		echo Reading Global Environment from: $globalenvfile
+		set -a
+		source "$globalenvfile"
+		set +a
+	fi
 
-  if [ -e "$envfile" ]
-  then
-    echo Reading environment from: $envfile
-    set -a ; source "$envfile" ; set +a
-  fi
+	if [ -e "$envfile" ]; then
+		echo Reading environment from: $envfile
+		set -a
+		source "$envfile"
+		set +a
+	fi
 
-  if [ -e "$privenvfile" ]
-  then
-    echo Reading Private Environment from: $privenvfile
-    set -a ; source "$privenvfile" ; set +a
-  fi
+	if [ -e "$privenvfile" ]; then
+		echo Reading Private Environment from: $privenvfile
+		set -a
+		source "$privenvfile"
+		set +a
+	fi
 
-function listcontainerips {
-echo ""
-printf "%-20s %s\n" "ADDRESS" "CONTAINER"
+	function listcontainerips {
+		echo ""
+		printf "%-20s %s\n" "ADDRESS" "CONTAINER"
 
-   for containerid in $(docker-compose -p $stackname -f $composefile ps -q);
-     do
-ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
-containername=$(docker inspect -f "{{.Name}}" $containerid)
+		for containerid in $(docker-compose -p $stackname -f $composefile ps -q); do
+			ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
+			containername=$(docker inspect -f "{{.Name}}" $containerid)
 
-if [ "$ipaddress" = "" ]
-then
-ipaddress="0.0.0.0"
-fi
+			if [ "$ipaddress" = "" ]; then
+				ipaddress="0.0.0.0"
+			fi
 
-printf "%-20s %s\n" $ipaddress $containername
-done
-echo ""
-}
+			printf "%-20s %s\n" $ipaddress $containername
+		done
+		echo ""
+	}
 
+	function restartcontainers {
+		docker-compose -p $stackname -f $composefile \
+			stop
 
-function restartcontainers {
-docker-compose -p $stackname -f $composefile \
-stop
+		docker-compose -p $stackname -f $composefile \
+			up -d
+	}
 
-docker-compose -p $stackname -f $composefile \
-up -d
-}
+	function debugcontainers {
+		docker-compose -p $stackname -f $composefile \
+			up
+	}
 
-function debugcontainers {
-docker-compose -p $stackname -f $composefile \
-up
-}
+	function removecontainers {
+		docker-compose -p $stackname -f $composefile stop
+		docker-compose -p $stackname -f $composefile rm
+	}
 
-function removecontainers {
-docker-compose -p $stackname -f $composefile stop
-docker-compose -p $stackname -f $composefile rm
-}
+	function murdercontaimers {
+		echo "CAUTION: This deletes everything relatd to this stack"
+		echo "(Volumes, Contaimers, Images, Networks etc)"
+		echo "Are you sure?"
 
-function murdercontaimers {
-echo "CAUTION: This deletes everything relatd to this stack"
-echo "(Volumes, Contaimers, Images, Networks etc)"
-wmecho "Are you sure?"
-n
-    select yn in "Yes" "No"; do
- case $yn in
-Yes) docker-compose -p $stackname -f $composefile \
-down -v --rmi all
-echo "Deleted"
-exit ry0;;
-Nochx) echo "Aborting"
-echo ""
-exit 0;;
-esac
-done
+		select yn in "Yes" "No"; do
+			case $yn in
+			Yes)
+				docker-compose -p $stackname -f $composefile \
+					down -v --rmi all
+				echo "Deleted"
+				exit 0
+				;;
+			Nochx)
+				echo "Aborting"
+				echo ""
+				exit 0
+				;;
+			esac
+		done
 
-echo ""
-}
+		echo ""
+	}
 
-function dockercompose()
-{
-docker-compose -p $stackname -f $composefile $cmd $paams
-}
+	function dockercompose() {
+		docker-compose -p $stackname -f $composefile $cmd $paams
+	}
 
- 
- case $cmd in
-   ip)
-    listcontainerips;;
-   restart)
-    restartcontainers;;
-   debug)
-    debugcontainers;;
-  rmw)
-    removecontainers;;
-  murder)
-    murdercontainer;;
-  *)
-    dockercompose;;
-  esac
+	case $cmd in
+	ip)
+		listcontainerips
+		;;
+	restart)
+		restartcontainers
+		;;
+	debug)
+		debugcontainers
+		;;
+	rmw)
+		removecontainers
+		;;
+	murder)
+		murdercontainer
+		;;
+	*)
+		dockercompose
+		;;
+	esac
 
 else
-  echo Cannot find compose file: $composefile
-  echo Aborting
-  exit  1
+	echo Cannot find compose file: $composefile
+	echo Aborting
+	exit 1
 fi
 
 echo ""
-

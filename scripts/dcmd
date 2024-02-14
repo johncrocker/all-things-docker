@@ -77,6 +77,12 @@ function murdercontaimers {
 	echo ""
 }
 
+function genrunbook()
+echo "#!/bin/bash"
+echo "docker-compose -p $1 -f $2 up -d"
+}
+
+
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
 	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
 	exit 1
@@ -144,6 +150,9 @@ if [ -e "$composefile" ]; then
 	murder)
 		murdercontainer $stackname $composefile
 		;;
+        runbook)
+                genrunbook $stackname $composefile $project
+                ;;
 	*)
 		dockercompose $stackname $composefile $cmd $params
 		;;

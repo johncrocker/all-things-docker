@@ -1,12 +1,16 @@
 #!/bin/bash
 
+echoerr() { printf "%s\n" "$*" >&2; }
+echoinfo() { printf "%s\n" "$*" >&2; }
+
+
 if [ "$DOCKER_ENV" = "" ]; then
-	echo "CRITICAL: Environment varable DOCKER_ENV must be set to the folder containing the environnent files  used. Please resolve."
+	echoerr "CRITICAL: Environment varable DOCKER_ENV must be set to the folder containing the environnent files  used. Please resolve."
 	exit 1
 fi
 
 if [ "$DOCKER_SECRET_ENV" = "" ]; then
-	echo "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the folder containing the secret files used. Please resolve."
+	echoerr "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the folder containing the secret files used. Please resolve."
 	exit 1
 fi
 
@@ -23,9 +27,9 @@ cmd="$2"
 params=""
 
 if [ "$1" = "" ]; then
-	echo "ERROR: Parameter <<stackname>> not specified"
-	echo ""
-	echo "Format: dcmd <<stackname>> <<command>>"
+	echoerr "ERROR: Parameter <<stackname>> not specified"
+	echoerr ""
+	echoerr "Format: dcmd <<stackname>> <<command>>"
 	exit 1
 fi
 
@@ -39,27 +43,27 @@ if [ "$cmd" = "up" ]; then
 fi
 
 echo ""
-echo Stack·name:·$stackname
+echoinfo Stack·name:·$stackname
 
 if [ -e "$composefile" ]; then
-	echo Using compose file: $composefile
+	echoinfo Using compose file: $composefile
 
 	if [ -e "$globalenvfile" ]; then
-		echo Reading Global Environment from: $globalenvfile
+		echoinfo Reading Global Environment from: $globalenvfile
 		set -a
 		source "$globalenvfile"
 		set +a
 	fi
 
 	if [ -e "$envfile" ]; then
-		echo Reading environment from: $envfile
+		echoinfo Reading environment from: $envfile
 		set -a
 		source "$envfile"
 		set +a
 	fi
 
 	if [ -e "$privenvfile" ]; then
-		echo Reading Private Environment from: $privenvfile
+		echoinfo Reading Private Environment from: $privenvfile
 		set -a
 		source "$privenvfile"
 		set +a
@@ -150,8 +154,8 @@ if [ -e "$composefile" ]; then
 	esac
 
 else
-	echo Cannot find compose file: $composefile
-	echo Aborting
+	echoerr Cannot find compose file: $composefile
+	echoerr Aborting
 	exit 1
 fi
 

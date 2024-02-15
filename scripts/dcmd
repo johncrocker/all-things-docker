@@ -64,7 +64,7 @@ function murdercontaimers {
 			echo "Deleted"
 			exit 0
 			;;
-		Nochx)
+		No)
 			echo "Aborting"
 			exit 0
 			;;
@@ -86,7 +86,7 @@ function genrunbook() {
 	echo "#!/bin/bash"
 	echoenvfile "$4/global.env"
 	echoenvfile "$4/$3.env"
-	echoenvfile "$5/$project.env"
+	echoenvfile "$5/$3.env"
 	echo "docker-compose -p $1 -f $2 up -d"
 }
 

@@ -2,16 +2,12 @@ version: "3.9"
 
 services:
   pihole:
-    env_file:
-      - ${DOCKER_ENV}/pihole-v6.env
     container_name: pihole
     image: pihole/pihole:development-v6
     hostname: pihole
     volumes:
       - 'pihole:/etc/pihole/'
       - 'dnsmasq.d:/etc/dnsmasq.d/'
-    depends_on:
-      - unbound
     cap_add:
       - NET_ADMIN
       - NET_BIND_SERVICE
@@ -36,7 +32,7 @@ services:
       - VIRTUAL_HOST=${PIHOLE_VIRTUAL_HOST}
       - FTLCONIPv6=${PIHOLE_FTLCONIPv6}
       - FTLCONF_webserver_api_password=${PIHOLE_FTLCONF_webserver_api_password}
-   restart: unless-stopped
+    restart: unless-stopped
     network_mode: "host"
     labels:
       - "com.centurylinklabs.watchtower.enable=false"

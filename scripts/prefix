@@ -1,12 +1,12 @@
 #!/bin/bash
 
 if [ "$DOCKER_ENV" = "" ]; then
-echoerr "CRITICAL: Environment varable DOCKER_ENV must be set to the folder cont>
+echo "CRITICAL: Environment varable DOCKER_ENV must be set to the folder containing environment"
 exit 1
 fi
 
 if [ "$DOCKER_SECRET_ENV" = "" ]; then
-echoerr "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the fol>
+echo "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the folder contwining secrets"
  exit 1
 fi
 

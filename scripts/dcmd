@@ -52,7 +52,7 @@ function removecontainers {
 	dockercompose $1 $2 rm
 }
 
-function murdercontaimers {
+function murdercontainers {
 	echo "CAUTION: This deletes everything relatd to this stack"
 	echo "(Volumes, Contaimers, Images, Networks etc)"
 	echo "Are you sure?"

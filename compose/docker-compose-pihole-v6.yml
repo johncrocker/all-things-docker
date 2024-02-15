@@ -6,41 +6,47 @@ services:
       - ${DOCKER_ENV}/pihole-v6.env
     container_name: pihole
     image: pihole/pihole:development-v6
-    hostname: piholev6
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "3008:80/tcp"
+    hostname: pihole
     volumes:
       - 'pihole:/etc/pihole/'
       - 'dnsmasq.d:/etc/dnsmasq.d/'
+    depends_on:
+      - unbound
     cap_add:
       - NET_ADMIN
       - NET_BIND_SERVICE
       - NET_RAW
       - SYS_NICE
       - CHOWN
-    restart: unless-stopped
-    networks:
-      backend:
-       ipv4_address: '172.31.0.100'
+    environment:
+      - TZ=${TZ}
+      - FTLCONF_dhcp_active=${PIHOLE_FTLCONF_dhcp_active}
+      - FTLCONF_dhcp_end=${PIHOLE_FTLCONF_dhcp_end}
+      - FTLCONF_dhcp_netmask=${PIHOLE_FTLCONF_dhcp_netmask}
+      - FTLCONF_dhcp_ipv6=${PIHOLE_FTLCONF_dhcp_ipv6}
+      - FTLCONF_dhcp_leaseTime=${PIHOLE_FTLCONF_dhcp_leaseTime}
+      - FTLCONF_dhcp_rapidCommit=${PIHOLE_FTLCONF_dhcp_rapidCommit}
+      - FTLCONF_dhcp_router=${PIHOLE_FTLCONF_dhcp_router}
+      - FTLCONF_dhcp_start=${PIHOLE_FTLCONF_dhcp_start}
+      - FTLCONF_dns_listeningMode=${PIHOLE_FTLCONF_dns_listeningMode}
+      - FTLCONF_dns_upstreams=${PIHOLE_FTLCONF_dns_upstreams}
+      - FTLCONF_dns_domain=${PIHOLE_FTLCONF_dns_domain}
+      - ServerIP=${PIHOLE_ServerIP}
+      - VIRTUAL_HOST=${PIHOLE_VIRTUAL_HOST}
+      - FTLCONIPv6=${PIHOLE_FTLCONIPv6}
+      - FTLCONF_webserver_api_password=${PIHOLE_FTLCONF_webserver_api_password}
+   restart: unless-stopped
+    network_mode: "host"
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
       - homepage.group=Containers
       - homepage.name=PiHole v6
-      - homepage.href=http://192.269.1.202:8084/admin/
+      - homepage.href=http://192.168.1.201:8084/admin/
       - homepage.description=PiHole v6 Beta Service
       - "diun.enable=true"
       - "diun.watch_repo=true"
       - "diun.include_tags=development-v6"
 
-networks:
-  backend:
-    ipam:
-      config:
-        - subnet: 172.31.0.0/16
-
 volumes:
   pihole:
   dnsmasq.d:
-

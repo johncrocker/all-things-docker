@@ -2,15 +2,9 @@
 
 services:
   pihole:
-    env_file:
-      - ${DOCKER_ENV}/pihole.env
     container_name: pihole
     image: pihole/pihole:latest
     hostname: pihole
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "3007:80/tcp"
     volumes:
       - 'pihole:/etc/pihole/'
       - 'dnsmasq.d:/etc/dnsmasq.d/'
@@ -20,10 +14,25 @@ services:
       - NET_RAW
       - SYS_NICE
       - CHOWN
+    environment:
+      - TZ=${TZ}
+      - DHCP_ACTIVE=${PIHOLE_DHCP_ACTIVE}
+      - DHCP_END=${PIHOLE_DHCP_END}
+      - DHCP_IPv6=${PIHOLE_DHCP_IPv6}
+      - DHCP_LEASETIME=${PIHOLE_DHCP_LEASETIME}
+      - DHCP_rapid_commit=${PIHOLE_DHCP_rapid_commit}
+      - DHCP_ROUTER=${PIHOLE_DHCP_ROUTER}
+      - DHCP_START=${PIHOLE_DHCP_START}
+      - DNSMASQ_LISTENING=${PIHOLE_DNSMASQ_LISTENING}
+      - PIHOLE_DNS_=${PIHOLE_PIHOLE_DNS_}
+      - PIHOLE_DOMAIN=${PIHOLE_PIHOLE_DOMAIN}
+      - ServerIP=${PIHOLE_ServerIP}
+      - VIRTUAL_HOST=${PIHOLE_VIRTUAL_HOST}
+      - WEB_PORT=${PIHOLE_WEB_PORT}
+      - IPv6=${PIHOLE_IPv6}
+      - WEBPASSWORD=${PIHOLE_WEBPASSWORD}
     restart: unless-stopped
-    networks:
-      backend:
-       ipv4_address: '172.31.0.100'
+    network_mode: 'host'
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
       - homepage.group=Containers
@@ -34,12 +43,7 @@ services:
       - "diun.watch_repo=true"
       - "diun.include_tags=latest"
 
-networks:
-  backend:
-    ipam:
-      config:
-        - subnet: 172.31.0.0/16
-
 volumes:
   pihole:
   dnsmasq.d:
+

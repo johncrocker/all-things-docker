@@ -85,8 +85,8 @@ function echoenvfile() {
 function genrunbook() {
 	echo "#!/bin/bash"
 	echoenvfile "$4/global.env"
-	echoenvfile "$4/$3.env"
-	echoenvfile "$5/$3.env"
+	echoenvfile "$4/$6.env"
+	echoenvfile "$5/$6.env"
 	echo "docker-compose -p $1 -f $2 up -d"
 }
 
@@ -105,8 +105,8 @@ function echokeyfile() {
 function genkeys() {
 	echo "    environment:"
 	echokeyfile "$3" "$4/global.env"
-	echokeyfile "$3" "$4/$3.env"
-	echokeyfile "$3" "$5/$3.env"
+	echokeyfile "$3" "$4/$6.env"
+	echokeyfile "$3" "$5/$6.env"
 }
 
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
@@ -133,6 +133,7 @@ composefile="$DOCKER_COMPOSE_FOLDER/docker-compose-$project.yml"
 stackname="$project-stack"
 cmd="$2"
 params=""
+envprefix="$1"
 
 if [ "$project" = "" ]; then
 	echoerr "ERROR: Parameter <<stackname>> not specified"
@@ -144,6 +145,7 @@ fi
 if [ ! -z "$3" ]; then
 	composefile="$DOCKER_COMPOSE_FOLDER/docker-compose-$2.yml"
 	cmd="$3"
+        envprefix="$2"
 fi
 
 if [ "$cmd" = "up" ]; then
@@ -156,8 +158,8 @@ if [ -e "$composefile" ]; then
 	echoinfo "Using compose file: $composefile"
 
 	loadenvfile "$DOCKER_ENV/global.env"
-	loadenvfile "$DOCKER_ENV/$project.env"
-	loadenvfile "$DOCKER_SECRET_ENV/$project.env"
+	loadenvfile "$DOCKER_ENV/$envprefix.env"
+	loadenvfile "$DOCKER_SECRET_ENV/$envprefix.env"
 	echoinfo ""
 
 	case $cmd in
@@ -177,10 +179,10 @@ if [ -e "$composefile" ]; then
 		murdercontainer $stackname $composefile
 		;;
 	runbook)
-		genrunbook $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV
+		genrunbook $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
 		;;
 	keys)
-		genkeys $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV
+		genkeys $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
 		;;
 	*)
 		dockercompose $stackname $composefile $cmd $params

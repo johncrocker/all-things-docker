@@ -11,14 +11,19 @@ echo "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the folder
 fi
 
 prefix="${1^^}_"
+fileprefix="$2"
 
-filename="$DOCKER_ENV/$1.env"
+if [ -z "${fileprefix-}" ]; then
+  fileprefix="$1"
+fi
+
+filename="$DOCKER_ENV/$fileprefix.env"
 
 if [ -e "$filename" ]; then
   awk -v prefix="$prefix" '{print prefix $0}' "$filename"
 fi
 
-filename="$DOCKER_SECRET_ENV/$1.env"
+filename="$DOCKER_SECRET_ENV/$fileprefix.env"
 
 if [ -e "$filename" ]; then
 awk -v prefix="$prefix" '{print prefix $0}' "$filename"

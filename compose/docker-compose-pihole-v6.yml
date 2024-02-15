@@ -32,6 +32,7 @@ services:
       - FTLCONF_dns_upstreams=${PIHOLE_FTLCONF_dns_upstreams}
       - FTLCONF_dns_domain=${PIHOLE_FTLCONF_dns_domain}
       - ServerIP=${PIHOLE_ServerIP}
+      - FTLCONF_webserver_port=${PIHOLE_FTLCONF_webserver_port}
       - VIRTUAL_HOST=${PIHOLE_VIRTUAL_HOST}
       - FTLCONIPv6=${PIHOLE_FTLCONIPv6}
       - FTLCONF_webserver_api_password=${PIHOLE_FTLCONF_webserver_api_password}

@@ -26,7 +26,7 @@ function listcontainerips {
 
 	printf "%-20s %s\n" "ADDRESS" "CONTAINER"
 
-	for containerid in $(docker-compose -p $1 -f $2 ps -q); do
+	for containerid in $(dockercompose $1 $2 ps -q); do
 		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
 		containername=$(docker inspect -f "{{.Name}}" $containerid)
 
@@ -39,17 +39,17 @@ function listcontainerips {
 }
 
 function restartcontainers {
-	docker-compose -p $1 -f $2 stop
-	docker-compose -p $1 -f $2 up -d
+	dockercompose $1 $2 stop
+	dockercompose $1 $2 up -d
 }
 
 function debugcontainers {
-	docker-compose -p $1 -f $2 up
+	dockercompose $1 $2 up
 }
 
 function removecontainers {
-	docker-compose -p $1 -f $2 stop
-	docker-compose -p $1 -f $2 rm
+	dockercompose $1 $2 stop
+	dockercompose $1 $2 rm
 }
 
 function murdercontaimers {
@@ -60,7 +60,7 @@ function murdercontaimers {
 	select yn in "Yes" "No"; do
 		case $yn in
 		Yes)
-			docker-compose -p $1 -f $2 down -v --rmi all
+			dockercompose $1 $2 down -v --rmi all
 			echo "Deleted"
 			exit 0
 			;;

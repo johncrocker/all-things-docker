@@ -19,7 +19,7 @@ function loadenvfile() {
 }
 
 function dockercompose() {
-	docker-compose -p $1 -f $2 $3 $4
+	docker-compose -p $1 -f $2 $3 "${@:4}"
 }
 
 function listcontainerips {
@@ -176,7 +176,7 @@ if [ -e "$composefile" ]; then
 		removecontainers $stackname $composefile
 		;;
 	murder)
-		murdercontainer $stackname $composefile
+		murdercontainers $stackname $composefile
 		;;
 	runbook)
 		genrunbook $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
@@ -184,6 +184,13 @@ if [ -e "$composefile" ]; then
 	keys)
 		genkeys $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
 		;;
+        create)
+                dockercompose $stackname $composefile up --no-start
+ 	        ;;
+        recreate)
+                dockercompose $stackname $composefile down -v --rmi all
+                dockercompose $stackname $composefile up --no-start
+                ;;
 	*)
 		dockercompose $stackname $composefile $cmd $params
 		;;

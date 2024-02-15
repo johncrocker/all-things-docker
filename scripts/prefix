@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ "$DOCKER_ENV" = "" ]; then
+echoerr "CRITICAL: Environment varable DOCKER_ENV must be set to the folder cont>
+exit 1
+fi
+
+if [ "$DOCKER_SECRET_ENV" = "" ]; then
+echoerr "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the fol>
+ exit 1
+fi
+
+prefix="${1^^}_"
+
+filename="$DOCKER_ENV/$1.env"
+
+if [ -e "$filename" ]; then
+  awk -v prefix="$prefix" '{print prefix $0}' "$filename"
+fi
+
+filename="$DOCKER_SECRET_ENV/$1.env"
+
+if [ -e "$filename" ]; then
+awk -v prefix="$prefix" '{print prefix $0}' "$filename"
+fi

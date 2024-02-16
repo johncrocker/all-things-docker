@@ -37,9 +37,9 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
       - homepage.group=Containers
-      - homepage.name=PiHole v6
-      - homepage.href=http://192.168.1.201:3007/admin/
-      - homepage.description=PiHole v6 Beta Service
+      - homepage.name=PiHole
+      - homepage.href=http://pihole.lan/admin/
+      - homepage.description=PiHole Ad Blocker Service
       - "diun.enable=true"
       - "diun.watch_repo=true"
       - "diun.include_tags=development-v6"

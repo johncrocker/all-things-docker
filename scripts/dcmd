@@ -19,22 +19,33 @@ function loadenvfile() {
 }
 
 function dockercompose() {
-	docker-compose -p $1 -f $2 $3 "${@:4}"
+ 	docker-compose -p $1 -f $2 $3 "${@:4}"
+}
+
+function getdockerlabel() {
+        labelname="$1"
+        container="$2"
+        template="{{ index .Config.Labels \"$labelname\"}}"
+        labelvalue=$(docker inspect -f "$template" $container)
+        echo "$labelvalue"
 }
 
 function listcontainerips {
 
-	printf "%-20s %s\n" "ADDRESS" "CONTAINER"
+	printf "%-20s %-20s %s\n" "STACK" "ADDRESS" "CONTAINER"
 
 	for containerid in $(dockercompose $1 $2 ps -q); do
 		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
 		containername=$(docker inspect -f "{{.Name}}" $containerid)
+                projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+                configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+                workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
 
-		if [ "$ipaddress" = "" ]; then
+ 		if [ "$ipaddress" = "" ]; then
 			ipaddress="0.0.0.0"
 		fi
 
-		printf "%-20s %s\n" $ipaddress $containername
+		printf "%-20s %-20s %s\n" $projectname $ipaddress $containername
 	done
 }
 

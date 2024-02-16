@@ -120,6 +120,19 @@ function genkeys() {
 	echokeyfile "$3" "$5/$6.env"
 }
 
+function banner() {
+        echoinfo "DDDDD    CCCCC  MM    MM DDDDD   "
+        echoinfo "DD  DD  CC    C MMM  MMM DD  DD  "
+        echoinfo "DD   DD CC      MM MM MM DD   DD "
+        echoinfo "DD   DD CC    C MM    MM DD   DD "
+        echoinfo "DDDDDD   CCCCC  MM    MM DDDDDD  "
+        echoinfo "-------------------------------- "
+        echoinfo "Your friendly Docker command helper!"
+        echoinfo ""
+}
+
+bannner
+
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
 	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
 	exit 1

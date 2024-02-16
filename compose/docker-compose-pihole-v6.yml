@@ -16,19 +16,19 @@ services:
       - CHOWN
     environment:
       - TZ=${TZ}
-      - FTLCONF_dhcp_active=${PIHOLE_FTLCONF_dhcp_active}
-      - FTLCONF_dhcp_end=${PIHOLE_FTLCONF_dhcp_end}
-      - FTLCONF_dhcp_netmask=${PIHOLE_FTLCONF_dhcp_netmask}
-      - FTLCONF_dhcp_ipv6=${PIHOLE_FTLCONF_dhcp_ipv6}
-      - FTLCONF_dhcp_leaseTime=${PIHOLE_FTLCONF_dhcp_leaseTime}
-      - FTLCONF_dhcp_rapidCommit=${PIHOLE_FTLCONF_dhcp_rapidCommit}
-      - FTLCONF_dhcp_router=${PIHOLE_FTLCONF_dhcp_router}
-      - FTLCONF_dhcp_start=${PIHOLE_FTLCONF_dhcp_start}
-      - FTLCONF_dns_listeningMode=${PIHOLE_FTLCONF_dns_listeningMode}
-      - FTLCONF_dns_upstreams=${PIHOLE_FTLCONF_dns_upstreams}
-      - FTLCONF_dns_domain=${PIHOLE_FTLCONF_dns_domain}
+#      - FTLCONF_dhcp_active=${PIHOLE_FTLCONF_dhcp_active}
+#      - FTLCONF_dhcp_end=${PIHOLE_FTLCONF_dhcp_end}
+#      - FTLCONF_dhcp_netmask=${PIHOLE_FTLCONF_dhcp_netmask}
+#      - FTLCONF_dhcp_ipv6=${PIHOLE_FTLCONF_dhcp_ipv6}
+#      - FTLCONF_dhcp_leaseTime=${PIHOLE_FTLCONF_dhcp_leaseTime}
+#      - FTLCONF_dhcp_rapidCommit=${PIHOLE_FTLCONF_dhcp_rapidCommit}
+#      - FTLCONF_dhcp_router=${PIHOLE_FTLCONF_dhcp_router}
+#      - FTLCONF_dhcp_start=${PIHOLE_FTLCONF_dhcp_start}
+#      - FTLCONF_dns_listeningMode=${PIHOLE_FTLCONF_dns_listeningMode}
+#      - FTLCONF_dns_upstreams=${PIHOLE_FTLCONF_dns_upstreams}
+#      - FTLCONF_dns_domain=${PIHOLE_FTLCONF_dns_domain}
       - ServerIP=${PIHOLE_ServerIP}
-      - FTLCONF_webserver_port=${PIHOLE_FTLCONF_webserver_port}
+#      - FTLCONF_webserver_port=${PIHOLE_FTLCONF_webserver_port}
       - VIRTUAL_HOST=${PIHOLE_VIRTUAL_HOST}
       - FTLCONIPv6=${PIHOLE_FTLCONIPv6}
       - FTLCONF_webserver_api_password=${PIHOLE_FTLCONF_webserver_api_password}
@@ -38,7 +38,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
       - homepage.group=Containers
       - homepage.name=PiHole v6
-      - homepage.href=http://192.168.1.201:8084/admin/
+      - homepage.href=http://192.168.1.201:3007/admin/
       - homepage.description=PiHole v6 Beta Service
       - "diun.enable=true"
       - "diun.watch_repo=true"

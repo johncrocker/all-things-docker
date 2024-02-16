@@ -131,7 +131,7 @@ function banner() {
         echoinfo ""
 }
 
-bannner
+banner
 
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
 	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."

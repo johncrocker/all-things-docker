@@ -19,15 +19,15 @@ function loadenvfile() {
 }
 
 function dockercompose() {
- 	docker-compose -p $1 -f $2 $3 "${@:4}"
+	docker-compose -p $1 -f $2 $3 "${@:4}"
 }
 
 function getdockerlabel() {
-        labelname="$1"
-        container="$2"
-        template="{{ index .Config.Labels \"$labelname\"}}"
-        labelvalue=$(docker inspect -f "$template" $container)
-        echo "$labelvalue"
+	labelname="$1"
+	container="$2"
+	template="{{ index .Config.Labels \"$labelname\"}}"
+	labelvalue=$(docker inspect -f "$template" $container)
+	echo "$labelvalue"
 }
 
 function listcontainerips {
@@ -37,11 +37,11 @@ function listcontainerips {
 	for containerid in $(dockercompose $1 $2 ps -q); do
 		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
 		containername=$(docker inspect -f "{{.Name}}" $containerid)
-                projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
-                configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
-                workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+		workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
 
- 		if [ "$ipaddress" = "" ]; then
+		if [ "$ipaddress" = "" ]; then
 			ipaddress="0.0.0.0"
 		fi
 
@@ -121,40 +121,38 @@ function genkeys() {
 }
 
 function banner() {
-        echoinfo "DDDDD    CCCCC  MM    MM DDDDD   "
-        echoinfo "DD  DD  CC    C MMM  MMM DD  DD  "
-        echoinfo "DD   DD CC      MM MM MM DD   DD "
-        echoinfo "DD   DD CC    C MM    MM DD   DD "
-        echoinfo "DDDDDD   CCCCC  MM    MM DDDDDD  "
-        echoinfo "-------------------------------- "
-        echoinfo "Your friendly Docker command helper!"
-        echoinfo ""
+	echoinfo "DDDDD    CCCCC  MM    MM DDDDD   "
+	echoinfo "DD  DD  CC    C MMM  MMM DD  DD  "
+	echoinfo "DD   DD CC      MM MM MM DD   DD "
+	echoinfo "DD   DD CC    C MM    MM DD   DD "
+	echoinfo "DDDDDD   CCCCC  MM    MM DDDDDD  "
+	echoinfo "-------------------------------- "
+	echoinfo "Your friendly Docker command helper!"
+	echoinfo ""
 }
 
 function helptext() {
-echoinfo "Format: dcmd <<projectnane>> <<command>> <<arguments>>"
-echoinfo "Where <<command>> is one of :"
-echoinfo "  ip - Lists IP Addresses of containers in a stack"
-echoinfo "  restart - Restarts all containers in a stsck"
-echoinfo "  debug - Starts a stack in attached (debug) mode"
-echoinfo "  rm - Removes all containers in a stack"
-echoinfo "  murder - Deletes all containers, networks, volumes, images in a stack"
-echoinfo "  runbook - Creates a Bash script to provision a stack"
-echoinfo "  keys - Lists defined environment in a stack"
-echoinfo "  create - Creates but does not run a stack"
-echoinfo "  recreate - Deletes all containers, networks, volumes, images in a stack and then recreates them"
-echoinfo "  up - Starts a stack in detached mode"
-echoinfo ""
+	echoinfo "Format: dcmd <<projectnane>> <<command>> <<arguments>>"
+	echoinfo "Where <<command>> is one of :"
+	echoinfo "  ip - Lists IP Addresses of containers in a stack"
+	echoinfo "  restart - Restarts all containers in a stsck"
+	echoinfo "  debug - Starts a stack in attached (debug) mode"
+	echoinfo "  rm - Removes all containers in a stack"
+	echoinfo "  murder - Deletes all containers, networks, volumes, images in a stack"
+	echoinfo "  runbook - Creates a Bash script to provision a stack"
+	echoinfo "  keys - Lists defined environment in a stack"
+	echoinfo "  create - Creates but does not run a stack"
+	echoinfo "  recreate - Deletes all containers, networks, volumes, images in a stack and then recreates them"
+	echoinfo "  up - Starts a stack in detached mode"
+	echoinfo ""
 }
-
 
 banner
 
 if [ $# -lt 2 ]; then
-    helptext
-    exit 1
+	helptext
+	exit 1
 fi
-
 
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
 	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
@@ -182,17 +180,21 @@ cmd="$2"
 params=""
 envprefix="$1"
 
-if [ "$project" = "" ]; then
-	echoerr "ERROR: Parameter <<stackname>> not specified"
-	echoerr ""
-	echoerr "Format: dcmd <<stackname>> <<command>>"
-	exit 1
-fi
-
-if [ ! -z "$3" ]; then
-	composefile="$DOCKER_COMPOSE_FOLDER/docker-compose-$2.yml"
-	cmd="$3"
-        envprefix="$2"
+if [ $# -gt 2 ]; then
+	for i in "$@"; do
+		case $i in
+		-f=* | --file=*)
+			envprefix="${i#*=}"
+			composefile="$DOCKER_COMPOSE_FOLDER/docker-compose-$envprefix.yml"
+			shift
+			;;
+		-* | --*)
+			echoerr "Unknown argument: $i"
+			exit 1
+			;;
+		*) ;;
+		esac
+	done
 fi
 
 if [ "$cmd" = "up" ]; then
@@ -231,13 +233,13 @@ if [ -e "$composefile" ]; then
 	keys)
 		genkeys $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
 		;;
-        create)
-                dockercompose $stackname $composefile up --no-start
- 	        ;;
-        recreate)
-                dockercompose $stackname $composefile down -v --rmi all
-                dockercompose $stackname $composefile up --no-start
-                ;;
+	create)
+		dockercompose $stackname $composefile up --no-start
+		;;
+	recreate)
+		dockercompose $stackname $composefile down -v --rmi all
+		dockercompose $stackname $composefile up --no-start
+		;;
 	*)
 		dockercompose $stackname $composefile $cmd $params
 		;;

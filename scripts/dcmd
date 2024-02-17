@@ -131,7 +131,30 @@ function banner() {
         echoinfo ""
 }
 
+function helptext() {
+echoinfo "Format: dcmd <<projectnane>> <<command>> <<arguments>>"
+echoinfo "Where <<command>> is one of :"
+echoinfo "  ip - Lists IP Addresses of containers in a stack"
+echoinfo "  restart - Restarts all containers in a stsck"
+echoinfo "  debug - Starts a stack in attached (debug) mode"
+echoinfo "  rm - Removes all containers in a stack"
+echoinfo "  murder - Deletes all containers, networks, volumes, images in a stack"
+echoinfo "  runbook - Creates a Bash script to provision a stack"
+echoinfo "  keys - Lists defined environment in a stack"
+echoinfo "  create - Creates but does not run a stack"
+echoinfo "  recreate - Deletes all containers, networks, volumes, images in a stack and then recreates them"
+echoinfo "  up - Starts a stack in detached mode"
+echoinfo ""
+}
+
+
 banner
+
+if [ $# -lt 2 ]; then
+    helptext
+    exit 1
+fi
+
 
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
 	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
@@ -196,7 +219,7 @@ if [ -e "$composefile" ]; then
 	debug)
 		debugcontainers $stackname $composefile
 		;;
-	rmw)
+	rm)
 		removecontainers $stackname $composefile
 		;;
 	murder)

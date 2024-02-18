@@ -7,10 +7,14 @@ services:
     image: ixdotai/smtp:latest
     restart: unless-stopped
     ports:
-      - "127.0.0.1:25:25"
+      - "25:25"
+      - "587:25"
     environment:
-      - GMAIL_USER=${SMTP_GMAIL_USER}
-      - GMAIL_PASSWORD=${SMTP_GMAIL_PASSWORD}
+      - SMARTHOST_ADDRESS=${SMTP_SMARTHOST_ADDRESS}
+      - SMARTHOST_PORT=${SMTP_SMARTHOST_PORT}
+      - SMARTHOST_USER=${SMTP_SMARTHOST_USER}
+      - SMARTHOST_PASSWORD=${SMTP_SMARTHOST_PASSWORD}
+      - SMARTHOST_ALIASES=${SMTP_SMARTHOST_ALIASES}
     labels:
       - homepage.group=Containers
       - homepage.name=SMTP

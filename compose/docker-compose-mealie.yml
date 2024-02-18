@@ -21,6 +21,9 @@ services:
       - MAX_WORKERS=1
       - WEB_CONCURRENCY=1
       - BASE_URL=http://mealie.lan
+      - SMTP_HOST=${MEALIE_SMTP_HOST}
+      - SMTP_AUTH_STRATEGY=NONE
+      - SMTP_FROM_EMAIL=${MEALIE_SMTP_FROM_EMAIL}
     restart: unless-stopped
     labels:
       - homepage.group=Containers

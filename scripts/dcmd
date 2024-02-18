@@ -11,7 +11,7 @@ function echoinfo() {
 function loadenvfile() {
 	envfile="$1"
 	if [ -e "$envfile" ]; then
-		echoinfo "Reading Environmemt file: $envfile"
+		echoinfo "Reading Environment file: $envfile"
 		set -a
 		source "$envfile"
 		set +a

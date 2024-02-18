@@ -14,7 +14,7 @@ services:
     volumes:
       - mealie_data:/app/data/
     environment:
-      - ALLOW_SIGNUP=true
+      - ALLOW_SIGNUP=false
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}

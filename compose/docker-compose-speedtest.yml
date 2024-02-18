@@ -19,7 +19,7 @@ services:
     labels:
       - homepage.group=Containers
       - homepage.name=Speedtest
-      - homepage.href=http://192.168.1.201:3024
+      - homepage.href=http://speedtest.lan
       - homepage.description=Ookla Speedtest Service
       - "diun.enable=true"
       - "diun.watch_repo=true"

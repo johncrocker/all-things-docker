@@ -97,13 +97,14 @@ function genrunbook() {
 	echo "#!/bin/bash"
 
         echo "export DOCKER_GATEWAY_HOST=\$(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print \$3}')"
+        echo "export DOCKER_COMPOSE_FOLDER=\"$DOCKER_COMPOSE_FOLDER\""
         echo "export PUID=\"\$UID\""
         echo "export PGID=\$(getent group docker | cut -d: -f3)"
 
 	echoenvfile "$4/global.env"
 	echoenvfile "$4/$6.env"
 	echoenvfile "$5/$6.env"
-	echo "docker-compose -p $1 -f $2 up -d"
+	echo "docker-compose -p $1 -f \$DOCKER_COMPOSE_FOLDER/$2 up -d"
 }
 
 function echokeyfile() {
@@ -179,7 +180,8 @@ export PUID="$UID"
 export PGID=$(getent group docker | cut -d: -f3)
 
 project="$1"
-composefile="$DOCKER_COMPOSE_FOLDER/docker-compose-$project.yml"
+composefilename="docker-compose-$project.yml"
+composefile="$DOCKER_COMPOSE_FOLDER/$composefilename"
 stackname="$project-stack"
 cmd="$2"
 params=""
@@ -190,7 +192,8 @@ if [ $# -gt 2 ]; then
 		case $i in
 		-f=* | --file=*)
 			envprefix="${i#*=}"
-			composefile="$DOCKER_COMPOSE_FOLDER/docker-compose-$envprefix.yml"
+                        composefilename="docker-compose-$envprefix.yml"
+                        composefile="$DOCKER_COMPOSE_FOLDER/$composefilename"
 			shift
 			;;
 		-* | --*)
@@ -233,7 +236,7 @@ if [ -e "$composefile" ]; then
 		murdercontainers $stackname $composefile
 		;;
 	runbook)
-		genrunbook $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		genrunbook $stackname $composefilename $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
 		;;
 	keys)
 		genkeys $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix

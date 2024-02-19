@@ -30,12 +30,20 @@ function getdockerlabel() {
 	echo "$labelvalue"
 }
 
+function getdockerimagename() {
+        container="$1"
+        template="{{ index .Config.Image }}"
+        imagename=$(docker inspect -f "$template" $container)
+        echo "$imagename"
+}
+
 function listcontainerips {
 
 	printf "%-20s %-20s %s\n" "STACK" "ADDRESS" "CONTAINER"
 
 	for containerid in $(dockercompose $1 $2 ps -q); do
 		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
+                imagename=$(getdockerimagename "$containerid")
 		containername=$(docker inspect -f "{{.Name}}" $containerid)
 		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
 		configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
@@ -93,6 +101,37 @@ function echoenvfile() {
 	fi
 }
 
+function updatecontainers() {
+updatechanged="no"
+
+for containerid in $(dockercompose $1 $2 ps -q); do
+imagename=$(getdockerimagename "$containerid")
+containername=$(docker inspect -f "{{.Name}}" $containerid)
+currenthash=$(docker image ls "$imagename" --quiet)
+result=$(docker pull "$imagename")
+newhash=$(docker image ls "$imagename" --quiet)
+
+if [[ "$currenthash" != "$newhash" ]]; then
+  echoinfo "Changed:   $containername ($imagename)"
+  updatechanged="yes"
+else
+  echoinfo "No Change: $containername ($imagename)"
+fi
+
+done
+
+if [[ "$updatechanged" = "yes" ]] then
+  echoinfo "Something changed, restarting stack"
+  restartcontainers "$1" "$2"
+  echoinfo "Restarted stack"
+else
+  echoinfo "No changes, no restart needed."
+fi
+
+echoinfo "Finished"
+}
+
+
 function genrunbook() {
 	echo "#!/bin/bash"
 
@@ -149,6 +188,7 @@ function helptext() {
 	echoinfo "  keys - Lists defined environment in a stack"
 	echoinfo "  create - Creates but does not run a stack"
 	echoinfo "  recreate - Deletes all containers, networks, volumes, images in a stack and then recreates them"
+        echoinfo "  update - Updates and restarts containers from repo"
 	echoinfo "  up - Starts a stack in detached mode"
 	echoinfo ""
 }
@@ -248,6 +288,9 @@ if [ -e "$composefile" ]; then
 		dockercompose $stackname $composefile down -v --rmi all
 		dockercompose $stackname $composefile up --no-start
 		;;
+        update)
+                updatecontainers $stackname $composefilename $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+                ;;
 	*)
 		dockercompose $stackname $composefile $cmd $params
 		;;

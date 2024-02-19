@@ -1,0 +1,81 @@
+#!/bin/bash
+
+function echoerr() {
+	printf "%s\n" "$*" >&2
+}
+
+function echoinfo() {
+	printf "%s\n" "$*" >&2
+}
+
+function dockercompose() {
+	docker-compose -p $1 -f $2 $3 "${@:4}"
+}
+
+function getdockerlabel() {
+	labelname="$1"
+	container="$2"
+	template="{{ index .Config.Labels \"$labelname\"}}"
+	labelvalue=$(docker inspect -f "$template" $container)
+	echo "$labelvalue"
+}
+
+function getdockerimagename() {
+	container="$1"
+	template="{{ index .Config.Image }}"
+	imagename=$(docker inspect -f "$template" $container)
+	echo "$imagename"
+}
+
+declare -A restartcontainers
+
+updatchanged="no"
+
+for containerid in $(docker ps -q); do
+	ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
+	imagename=$(getdockerimagename "$containerid")
+	containername=$(docker inspect -f "{{.Name}}" $containerid)
+	echoinfo "Checking $containername"
+	projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+	configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+	workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+	currenthash=$(docker image ls "$imagename" --quiet)
+	result=$(docker pull "$imagename")
+	newhash=$(docker image ls "$imagename" --quiet)
+	configfile="${configfile/$DOCKER_COMPOSE_FOLDER\//}"
+
+	if [[ "$currenthash" = "$newhash" ]]; then
+		echoinfo "Changed:   $containername ($imagename)"
+		restartcontainers["$projectname"]="$configfile"
+		updatechanged="yes"
+		break
+	else
+		echoinfo "No Change: $containername ($imagename)"
+	fi
+
+done
+
+if [[ "$updatechanged" = "yes" ]]; then
+	echoinfo "Something changed, restarting stacks affected;"
+
+	for project in "${!restartcontainers[@]}"; do
+		echoinfo "Restarting $project"
+		composefile="${restartcontainers[${project}]}"
+		envprefix="${composefile/docker-compose-/}"
+		envprefix="${envprefix%.*}"
+		echoinfo "Compose file: $composefile"
+		if [[ "$project" = "$envprefix" ]]; then
+			dcmd "$project" rebuild
+		else
+			dcmd "$project" rebuild --file=$envprefix
+		fi
+	done
+
+	echoinfo "Restarted stacks"
+	echoinfo "Please note, previous versions are retained and must be cleared manually."
+else
+	echoinfo "No changes, no restart needed."
+fi
+
+echoinfo "Finished"
+echoinfo ""

@@ -95,6 +95,11 @@ function echoenvfile() {
 
 function genrunbook() {
 	echo "#!/bin/bash"
+
+        echo "export DOCKER_GATEWAY_HOST=\$(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print \$3}')"
+        echo "export PUID=\"\$UID\""
+        echo "export PGID=\$(getent group docker | cut -d: -f3)"
+
 	echoenvfile "$4/global.env"
 	echoenvfile "$4/$6.env"
 	echoenvfile "$5/$6.env"
@@ -171,7 +176,7 @@ fi
 
 export DOCKER_GATEWAY_HOST=$(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print $3}')
 export PUID="$UID"
-export PGID="$UID"
+export PGID=$(getent group docker | cut -d: -f3)
 
 project="$1"
 composefile="$DOCKER_COMPOSE_FOLDER/docker-compose-$project.yml"

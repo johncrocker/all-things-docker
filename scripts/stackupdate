@@ -72,9 +72,9 @@ if [[ "$updatechanged" = "yes" ]]; then
 		echoinfo "Compose file: $composefile"
 
 		if [[ "$projectname" = "$envprefix" ]]; then
-			dcmd "$projectname" rebuild
+			result=$(dcmd "$projectname" rebuild)
 		else
-			dcmd "$projectname" rebuild --file=$envprefix
+			result=$(dcmd "$projectname" rebuild --file=$envprefix)
 		fi
 	done
 

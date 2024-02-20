@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  tailscaled:
+    image: tailscale/tailscale:latest
+    container_name: tailscaled
+    restart: always
+    network_mode: "host"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - "data:/var/lib/tailscale"
+    privileged: true
+    devices:
+      - /dev/net/tun
+    environment:
+      - TZ=${TZ}
+      - TS_AUTHKEY=${TAILSCALE_TS_AUTHKEY}
+      - TS_HOSTNAME=${TAILSCALE_TS_HOSTNAME}
+      - TS_ROUTES=${TAILSCALE_TS_ROUTES}
+      - TS_ACCEPT_DNS=${TAILSCALE_TS_ACCEPT_DNS}
+      - TS_AUTH_ONCE=${TAILSCALE_TS_AUTH_ONCE}
+      - TS_STATE_DIR=${TAILSCALE_TS_STATE_DIR}
+      - TS_EXTRA_ARGS=${TAILSCALE_TS_EXTRA_ARGS}
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Tailscale
+      - homepage.href=https://login.tailscale.com/admin
+      - homepage.description=Tailscale Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - "com.centurylinklabs.watchtower.enable=false"
+
+volumes:
+  data:

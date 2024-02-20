@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  ciao:
+    env_file:
+      - ${DOCKER_ENV}/ciao.env
+    image: brotandgames/ciao:latest
+    container_name: ciao
+    restart: unless-stopped
+    ports:
+      - '3001:3000'
+    volumes:
+      - "ciao-data:/app/db/sqlite/"
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Ciao
+      - homepage.href=http://ciao.lan
+      - homepage.description=Ciao Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  ciao-data:

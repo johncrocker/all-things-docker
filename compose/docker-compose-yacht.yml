@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  yacht:
+    container_name: yacht
+    image: selfhostedpro/yacht:latest
+    hostname: yacht
+    ports:
+      - "3012:8000/tcp"
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - "yacht_data:/config"
+    restart: always
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Yacht
+      - homepage.href=http://yacht.lan/
+      - homepage.description=Yacht Container Manager
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  yacht_data:

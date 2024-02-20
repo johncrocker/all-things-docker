@@ -1,0 +1,314 @@
+#!/bin/bash
+
+function echoerr() {
+	printf "%s\n" "$*" >&2
+}
+
+function echoinfo() {
+	printf "%s\n" "$*" >&2
+}
+
+function loadenvfile() {
+	envfile="$1"
+	if [ -e "$envfile" ]; then
+		echoinfo "Reading Environment file: $envfile"
+		set -a
+		source "$envfile"
+		set +a
+	fi
+}
+
+function dockercompose() {
+	docker-compose -p $1 -f $2 $3 "${@:4}"
+}
+
+function getdockerlabel() {
+	labelname="$1"
+	container="$2"
+	template="{{ index .Config.Labels \"$labelname\"}}"
+	labelvalue=$(docker inspect -f "$template" $container)
+	echo "$labelvalue"
+}
+
+function getdockerimagename() {
+	container="$1"
+	template="{{ index .Config.Image }}"
+	imagename=$(docker inspect -f "$template" $container)
+	echo "$imagename"
+}
+
+function listcontainerips {
+
+	printf "%-20s %-20s %s\n" "STACK" "ADDRESS" "CONTAINER"
+
+	for containerid in $(dockercompose $1 $2 ps -q); do
+		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
+		imagename=$(getdockerimagename "$containerid")
+		containername=$(docker inspect -f "{{.Name}}" $containerid)
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+		workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+
+		if [ "$ipaddress" = "" ]; then
+			ipaddress="0.0.0.0"
+		fi
+
+		printf "%-20s %-20s %s\n" $projectname $ipaddress $containername
+	done
+}
+
+function restartcontainers {
+	dockercompose $1 $2 stop
+	dockercompose $1 $2 up -d
+}
+
+function rebuildcontainers() {
+	dockercompose $1 $2 stop
+	dockercompose $1 $2 rm -f
+	dockercompose $1 $2 up -d
+}
+
+function debugcontainers {
+	dockercompose $1 $2 up
+}
+
+function removecontainers {
+	dockercompose $1 $2 stop
+	dockercompose $1 $2 rm
+}
+
+function murdercontainers {
+	echo "CAUTION: This deletes everything relatd to this stack"
+	echo "(Volumes, Contaimers, Images, Networks etc)"
+	echo "Are you sure?"
+
+	select yn in "Yes" "No"; do
+		case $yn in
+		Yes)
+			dockercompose $1 $2 down -v --rmi all
+			echo "Deleted"
+			exit 0
+			;;
+		No)
+			echo "Aborting"
+			exit 0
+			;;
+		esac
+	done
+
+}
+
+function echoenvfile() {
+	envfile="$1"
+	if [ -e "$envfile" ]; then
+		while read p; do
+			printf 'export %s\n' "$p"
+		done <"$envfile"
+	fi
+}
+
+function updatecontainers() {
+	updatechanged="no"
+
+	for containerid in $(dockercompose $1 $2 ps -q); do
+		imagename=$(getdockerimagename "$containerid")
+		containername=$(docker inspect -f "{{.Name}}" $containerid)
+		currenthash=$(docker image ls "$imagename" --quiet)
+		result=$(docker pull "$imagename")
+		newhash=$(docker image ls "$imagename" --quiet)
+
+		if [[ "$currenthash" != "$newhash" ]]; then
+			echoinfo "Changed:   $containername ($imagename)"
+			updatechanged="yes"
+		else
+			echoinfo "No Change: $containername ($imagename)"
+		fi
+
+	done
+
+	if [[ "$updatechanged" = "yes" ]]; then
+		echoinfo "Something changed, restarting stack"
+		restartcontainers "$1" "$2"
+		echoinfo "Restarted stack"
+	else
+		echoinfo "No changes, no restart needed."
+	fi
+
+	echoinfo "Finished"
+}
+
+function genrunbook() {
+	echo "#!/bin/bash"
+
+	echo "export DOCKER_GATEWAY_HOST=\$(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print \$3}')"
+	echo "export DOCKER_COMPOSE_FOLDER=\"$DOCKER_COMPOSE_FOLDER\""
+	echo "export PUID=\"\$UID\""
+	echo "export PGID=\$(getent group docker | cut -d: -f3)"
+
+	echoenvfile "$4/global.env"
+	echoenvfile "$4/$6.env"
+	echoenvfile "$5/$6.env"
+	echo "docker-compose -p $1 -f \$DOCKER_COMPOSE_FOLDER/$2 up -d"
+}
+
+function echokeyfile() {
+	projectid="${1^^}_"
+	envfile="$2"
+
+	if [ -e "$envfile" ]; then
+		while IFS='=' read -r key value; do
+			dkey="$projectid"
+			echo "      - ${key#${projectid}}=\${$key}"
+		done <"$envfile"
+	fi
+}
+
+function genkeys() {
+	echo "    environment:"
+	echokeyfile "$3" "$4/global.env"
+	echokeyfile "$3" "$4/$6.env"
+	echokeyfile "$3" "$5/$6.env"
+}
+
+function banner() {
+	echoinfo "DDDDD    CCCCC  MM    MM DDDDD   "
+	echoinfo "DD  DD  CC    C MMM  MMM DD  DD  "
+	echoinfo "DD   DD CC      MM MM MM DD   DD "
+	echoinfo "DD   DD CC    C MM    MM DD   DD "
+	echoinfo "DDDDDD   CCCCC  MM    MM DDDDDD  "
+	echoinfo "-------------------------------- "
+	echoinfo "Your friendly Docker command helper!"
+	echoinfo ""
+}
+
+function helptext() {
+	echoinfo "Format: dcmd <<projectnane>> <<command>> <<arguments>>"
+	echoinfo "Where <<command>> is one of :"
+	echoinfo "  ip - Lists IP Addresses of containers in a stack"
+	echoinfo "  restart - Restarts all containers in a stack"
+	echoinfo "  rebuild - Deletes and recreates a stack but keeps persisted volumes"
+	echoinfo "  debug - Starts a stack in attached (debug) mode"
+	echoinfo "  rm - Removes all containers in a stack"
+	echoinfo "  murder - Deletes all containers, networks, volumes, images in a stack"
+	echoinfo "  runbook - Creates a Bash script to provision a stack"
+	echoinfo "  keys - Lists defined environment in a stack"
+	echoinfo "  create - Creates but does not run a stack"
+	echoinfo "  recreate - Deletes all containers, networks, volumes, images in a stack and then recreates them"
+	echoinfo "  update - Updates and restarts containers from repo"
+	echoinfo "  up - Starts a stack in detached mode"
+	echoinfo ""
+}
+
+banner
+
+if [ $# -lt 2 ]; then
+	helptext
+	exit 1
+fi
+
+if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
+	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
+	exit 1
+fi
+
+if [ "$DOCKER_ENV" = "" ]; then
+	echoerr "CRITICAL: Environment varable DOCKER_ENV must be set to the folder containing the environnent files  used. Please resolve."
+	exit 1
+fi
+
+if [ "$DOCKER_SECRET_ENV" = "" ]; then
+	echoerr "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the folder containing the secret files used. Please resolve."
+	exit 1
+fi
+
+export DOCKER_GATEWAY_HOST=$(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print $3}')
+export PUID="$UID"
+export PGID=$(getent group docker | cut -d: -f3)
+
+project="$1"
+composefilename="docker-compose-$project.yml"
+composefile="$DOCKER_COMPOSE_FOLDER/$composefilename"
+stackname="$project-stack"
+cmd="$2"
+params=""
+envprefix="$1"
+
+if [ $# -gt 2 ]; then
+	for i in "$@"; do
+		case $i in
+		-f=* | --file=*)
+			envprefix="${i#*=}"
+			composefilename="docker-compose-$envprefix.yml"
+			composefile="$DOCKER_COMPOSE_FOLDER/$composefilename"
+			shift
+			;;
+		-* | --*)
+			echoerr "Unknown argument: $i"
+			exit 1
+			;;
+		*) ;;
+		esac
+	done
+fi
+
+if [ "$cmd" = "up" ]; then
+	params="-d"
+fi
+
+echoinfo "Stack·name:·$stackname"
+
+if [ -e "$composefile" ]; then
+	echoinfo "Using compose file: $composefile"
+
+	loadenvfile "$DOCKER_ENV/global.env"
+	loadenvfile "$DOCKER_ENV/$envprefix.env"
+	loadenvfile "$DOCKER_SECRET_ENV/$envprefix.env"
+	echoinfo ""
+
+	case $cmd in
+	ip)
+		listcontainerips $stackname $composefile
+		;;
+	restart)
+		restartcontainers $stackname $composefile
+		;;
+	rebuild)
+		rebuildcontainers $stackname $composefile
+		;;
+	debug)
+		debugcontainers $stackname $composefile
+		;;
+	rm)
+		removecontainers $stackname $composefile
+		;;
+	murder)
+		murdercontainers $stackname $composefile
+		;;
+	runbook)
+		genrunbook $stackname $composefilename $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	keys)
+		genkeys $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	create)
+		dockercompose $stackname $composefile up --no-start
+		;;
+	recreate)
+		dockercompose $stackname $composefile down -v --rmi all
+		dockercompose $stackname $composefile up --no-start
+		;;
+	update)
+		updatecontainers $stackname $composefilename $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	*)
+		dockercompose $stackname $composefile $cmd $params
+		;;
+	esac
+
+else
+	echoerr Cannot find compose file: $composefile
+	echoerr Aborting
+	exit 1
+fi
+
+echoinfo ""

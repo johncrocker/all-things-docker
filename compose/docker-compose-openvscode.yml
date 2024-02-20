@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  openvscode:
+    image: gitpod/openvscode-server:latest
+    restart: unless-stopped
+    init: true
+    container_name: openvscode
+    environment:
+      - TZ=${TZ}
+    ports:
+      - "3006:3000"
+    volumes:
+      - "openvscode_data:/home/workspace:cached"
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Open VS Code
+      - homepage.href=http://openvscode.lan
+      - homepage.description=Visual Studio Code as a Web App
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  openvscode_data:

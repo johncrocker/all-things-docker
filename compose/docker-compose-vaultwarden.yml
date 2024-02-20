@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  vaultwarden:
+    env_file:
+      - ${DOCKER_ENV}/vaultwarden.env
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    ports:
+      - "3011:80"
+    volumes:
+      - vaultwarden-stack_data:/data/
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Vaultwarden
+      - homepage.href=https://vaultwarden.lan/
+      - homepage.description=Vaultwarden Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  vaultwarden-stack_data:

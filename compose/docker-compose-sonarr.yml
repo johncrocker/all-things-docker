@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  sonarr:
+    environment:
+      - TZ=${TZ}
+      - NODE_ENV=Production
+    container_name: sonarr
+    image: linuxserver/sonarr:latest
+    ports:
+      - "8989:8989"
+    volumes:
+      - "data:/config"
+      - "tvseries:/tv"
+      - "downloads:/downloads"
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Sonarr
+      - homepage.href=http://192.168.1.201:8989
+      - homepage.description=Media Manager
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  data:
+  tvseries:
+  downloads:

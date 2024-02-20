@@ -37,6 +37,33 @@ function getdockerimagename() {
 	echo "$imagename"
 }
 
+function getcontainername() {
+	containername=$(docker inspect -f "{{.Name}}" $1)
+	containername="${containername/\//}"
+	echo "$containername"
+}
+
+function updatecheck() {
+	printf "%-20s %-10s %s\n" "CONTAINER" "STATUS" "IMAGE"
+
+	for containerid in $(dockercompose $1 $2 ps -q); do
+		imagename=$(getdockerimagename "$containerid")
+		containername=$(getcontainername "$containerid")
+		status="no-change"
+		imagename=$(getdockerimagename "$containerid")
+		currenthash=$(docker image ls "$imagename" --quiet)
+		result=$(docker pull "$imagename")
+		newhash=$(docker image ls "$imagename" --quiet)
+
+		if [[ "$currenthash" != "$newhash" ]]; then
+			status="update-due"
+		fi
+
+		printf "%-20s %-10s %s\n" "$containername" "$status" "$imagename"
+	done
+
+}
+
 function listcontainerips {
 
 	printf "%-20s %-20s %s\n" "STACK" "ADDRESS" "CONTAINER"
@@ -44,7 +71,7 @@ function listcontainerips {
 	for containerid in $(dockercompose $1 $2 ps -q); do
 		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
 		imagename=$(getdockerimagename "$containerid")
-		containername=$(docker inspect -f "{{.Name}}" $containerid)
+		containername=$(getcontainername "$containerid")
 		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
 		configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
 		workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
@@ -112,7 +139,7 @@ function updatecontainers() {
 
 	for containerid in $(dockercompose $1 $2 ps -q); do
 		imagename=$(getdockerimagename "$containerid")
-		containername=$(docker inspect -f "{{.Name}}" $containerid)
+		containername=$(getcontainername "$containerid")
 		currenthash=$(docker image ls "$imagename" --quiet)
 		result=$(docker pull "$imagename")
 		newhash=$(docker image ls "$imagename" --quiet)
@@ -195,6 +222,7 @@ function helptext() {
 	echoinfo "  create - Creates but does not run a stack"
 	echoinfo "  recreate - Deletes all containers, networks, volumes, images in a stack and then recreates them"
 	echoinfo "  update - Updates and restarts containers from repo"
+	evhoinfo "  updatecheck - Checks which containers need updating from repo"
 	echoinfo "  up - Starts a stack in detached mode"
 	echoinfo ""
 }
@@ -268,6 +296,9 @@ if [ -e "$composefile" ]; then
 	case $cmd in
 	ip)
 		listcontainerips $stackname $composefile
+		;;
+	updatecheck)
+		updatecheck $stackname $composefile
 		;;
 	restart)
 		restartcontainers $stackname $composefile

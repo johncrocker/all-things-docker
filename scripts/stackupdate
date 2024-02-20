@@ -27,6 +27,12 @@ function getdockerimagename() {
 	echo "$imagename"
 }
 
+
+if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
+	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
+	exit 1
+fi
+
 declare -A restartcontainers
 
 updatchanged="no"

@@ -64,7 +64,7 @@ function restartcontainers {
 
 function rebuildcontainers() {
 	dockercompose $1 $2 stop
-	dockercompose $1 $2 rm -f
+	#dockercompose $1 $2 rm -f
 	dockercompose $1 $2 up -d
 }
 

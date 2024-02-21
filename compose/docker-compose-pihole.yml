@@ -7,7 +7,7 @@ services:
     hostname: pihole
     volumes:
       - 'pihole:/etc/pihole/'
-      - 'addonL/usr/local/share/bin/'
+      - 'addon:/usr/local/share/bin/'
       - 'dnsmasq.d:/etc/dnsmasq.d/'
     cap_add:
       - NET_ADMIN

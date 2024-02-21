@@ -11,6 +11,7 @@ services:
       - TZ=${TZ}
     volumes:
       - config:/config
+      - $HOME/syncthing:/data_user
     ports:
       - 8384:8384
       - 22000:22000/tcp

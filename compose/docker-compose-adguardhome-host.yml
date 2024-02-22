@@ -1,3 +1,4 @@
+# AdGuardHome - https://github.com/AdguardTeam/AdGuardHome/wiki/Docker
 version: "3.9"
 
 services:

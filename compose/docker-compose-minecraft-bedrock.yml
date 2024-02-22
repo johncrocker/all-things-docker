@@ -1,3 +1,4 @@
+# Minecraft Bedrock Server - https://github.com/itzg/docker-minecraft-server
 version: "3.9"
 
 services:

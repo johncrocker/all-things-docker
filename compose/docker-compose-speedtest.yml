@@ -1,3 +1,4 @@
+# Speedtest Tracker - https://hub.docker.com/r/linuxserver/speedtest-tracker
 version: "3.9"
 
 services:

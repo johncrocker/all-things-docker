@@ -1,3 +1,4 @@
+# Code Server - https://hub.docker.com/r/linuxserver/code-server
 version: "3.9"
 
 services:

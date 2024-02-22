@@ -1,4 +1,5 @@
-#version: "3.9"
+# Pi-Hole - https://pi-hole.net
+version: "3.9"
 
 services:
   pihole:

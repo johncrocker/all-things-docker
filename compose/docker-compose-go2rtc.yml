@@ -1,4 +1,6 @@
+# Go2Rtc - https://github.com/AlexxIT/go2rtc
 version: "3.9"
+
 services:
   go2rtc:
     env_file:

@@ -1,3 +1,4 @@
+# Sonarr - https://sonarr.tv and https://hub.docker.com/r/linuxserver/sonarr
 version: "3.9"
 
 services:

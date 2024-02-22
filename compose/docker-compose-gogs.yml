@@ -1,3 +1,4 @@
+# Gogs - https://www.gogs.io
 version: "3.9"
 
 services:

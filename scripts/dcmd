@@ -30,6 +30,12 @@ function getdockerlabel() {
 	echo "$labelvalue"
 }
 
+function dockerstats() {
+	docker container stats --all --no-stream \
+            --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" \
+            | (read -r; printf "%s\n" "$REPLY"; sort -k $3 )
+}
+
 function dockerexec() {
 	containername="$4"
 
@@ -253,6 +259,7 @@ function helptext() {
 	echoinfo "  up - Starts a stack in detached mode"
         echoinfo "  shell - Runs an interactive shell inside a container"
         echoinfo "  logs - Shows the logs for a given container"
+	echoinfo "  stats - Output Docker stats on all containers"
 	echoinfo ""
 }
 
@@ -290,6 +297,7 @@ stackname="$project-stack"
 cmd="$2"
 params=""
 envprefix="$1"
+sortcolumn="1"
 
 if [ $# -gt 2 ]; then
 	for i in "$@"; do
@@ -300,6 +308,10 @@ if [ $# -gt 2 ]; then
 			composefile="$DOCKER_COMPOSE_FOLDER/$composefilename"
 			shift
 			;;
+                -s=* | --sort=*)
+                        sortcolumn="${i#*=}"
+                        shift
+                        ;;
 		-* | --*)
 			echoerr "Unknown argument: $i"
 			exit 1
@@ -345,6 +357,9 @@ if [ -e "$composefile" ]; then
         logs)
                dockerlogs $stackname $composefile $3 "${@:4}"
                ;;
+        stats)
+              dockerstats $stackname $composefile $sortcolumn
+              ;;
 	rm)
 		removecontainers $stackname $composefile
 		;;

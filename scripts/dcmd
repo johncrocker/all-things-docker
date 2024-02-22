@@ -44,6 +44,19 @@ function dockerexec() {
 	fi
 }
 
+function dockerlogs() {
+        containername="$3"
+        if [ "$containername" = "" ]; then
+                firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
+                containername=$(getcontainername $firstcontainer)
+                echo "Showing logs for $containername"
+                docker logs $containername "${@:3}"
+        else
+                echo "Showing logs for $containername"
+                docker logs $containername "${@:4}"
+        fi
+}
+
 function getdockerimagename() {
 	container="$1"x
 	template="{{ index .Config.Image }}"
@@ -239,6 +252,7 @@ function helptext() {
 	echoinfo "  updatecheck - Checks which containers need updating from repo"
 	echoinfo "  up - Starts a stack in detached mode"
         echoinfo "  shell - Runs an interactive shell inside a container"
+        echoinfo "  logs - Shows the logs for a given container"
 	echoinfo ""
 }
 
@@ -328,6 +342,9 @@ if [ -e "$composefile" ]; then
         shell)
                 dockerexec $stackname $composefile "/bin/sh" $3  "${@:4}"
                 ;;
+        logs)
+               dockerlogs $stackname $composefile $3 "${@:4}"
+               ;;
 	rm)
 		removecontainers $stackname $composefile
 		;;

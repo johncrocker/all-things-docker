@@ -211,6 +211,7 @@ function genkeys() {
 }
 
 function banner() {
+	echoinfo ""
 	echoinfo "DDDDD    CCCCC  MM    MM DDDDD   "
 	echoinfo "DD  DD  CC    C MMM  MMM DD  DD  "
 	echoinfo "DD   DD CC      MM MM MM DD   DD "

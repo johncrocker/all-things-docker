@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+ minecraft:
+   env_file:
+     - ${DOCKER_ENV}/minecraft.env
+   image: itzg/minecraft-bedrock-server:latest
+   ports:
+     - "19132:19132/udp"
+   restart: unless-stopped
+   deploy:
+     resources:
+       limits:
+         memory: 1.5G
+   volumes:
+     - minecraft-bedrock-data:/data
+   labels:
+     - homepage.group=Containers
+     - homepage.name=Minecraft Bedrock
+     - homepage.description=Minecraft Service
+     - "diun.enable=true"
+     - "diun.watch_repo=true"
+     - "diun.include_tags=latest"
+
+volumes:
+  minecraft-bedrock-data:
+

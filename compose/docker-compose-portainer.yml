@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:alpine
+    command: -H unix:///var/run/docker.sock
+    hostname: portainer
+    ports:
+      - "3009:8000/tcp"
+      - "9443:9443/tcp"
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - "portainer_data:/data"
+    restart: always
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Portainer
+      - homepage.href=http://portainer.lan/
+      - homepage.description=Portainer Container Manager
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  portainer_data:

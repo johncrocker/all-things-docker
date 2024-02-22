@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  speedtest-tracker:
+    image: lscr.io/linuxserver/speedtest-tracker:latest
+    container_name: speedtest
+    hostname: speedtester
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - APP_KEY=${SPEEDTEST_APP_KEY}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=speedtestdb
+      - DB_PORT=5432
+      - DB_DATABASE=speedtest_tracker
+      - DB_USERNAME=speedy
+      - DB_PASSWORD=password
+    volumes:
+      - speedtest_config:/config
+    ports:
+      - 3024:80
+    restart: unless-stopped
+    depends_on:
+      - speedtestdb
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Speedtest
+      - homepage.href=http://speedtest.lan
+      - homepage.description=Ookla Speedtest Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+  speedtestdb:
+    image: postgres:alpine
+    container_name: speedtestdb
+    hostname: speedtestdb
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=speedtest_tracker
+      - POSTGRES_USER=speedy
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - speedtest-db:/var/lib/postgresql/data
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=alpine"
+
+volumes:
+  speedtest-db:
+  speedtest_config:

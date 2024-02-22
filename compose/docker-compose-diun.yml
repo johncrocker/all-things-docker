@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  diun:
+    image: crazymax/diun:latest
+    command: serve
+    hostname: diun
+    container_name: diun
+    volumes:
+      - "data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - LOG_LEVEL=${DIUN_LOG_LEVEL}
+      - LOG_JSON=${DIUN_LOG_JSON}
+      - DIUN_WATCH_WORKERS=${DIUN_DIUN_WATCH_WORKERS}
+      - DIUN_WATCH_SCHEDULE=${DIUN_DIUN_WATCH_SCHEDULE}
+      - DIUN_WATCH_JITTER=${DIUN_DIUN_WATCH_JITTER}
+      - DIUN_PROVIDERS_DOCKER=${DIUN_DIUN_PROVIDERS_DOCKER}
+      - DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=${DIUN_DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT}
+      - DIUN_REGOPTS_dockerio_NAME=${DIUN_DIUN_REGOPTS_dockerio_NAME}
+      - DIUN_REGOPTS_dockerio_SELECTOR=${DIUN_DIUN_REGOPTS_dockerio_SELECTOR}
+      - DIUN_REGOPTS_dockerio_USERNAME=${DIUN_DIUN_REGOPTS_dockerio_USERNAME}
+      - DIUN_REGOPTS_dockerio_PASSWORD=${DIUN_DIUN_REGOPTS_dockerio_PASSWORD}
+      - DIUN_NOTIF_MATRIX_HOMESERVERURL=${DIUN_DIUN_NOTIF_MATRIX_HOMESERVERURL}
+      - DIUN_NOTIF_MATRIX_USER=${DIUN_DIUN_NOTIF_MATRIX_USER}
+      - DIUN_NOTIF_MATRIX_PASSWORD=${DIUN_DIUN_NOTIF_MATRIX_PASSWORD}
+      - DIUN_NOTIF_MATRIX_ROOMID=${DIUN_DIUN_NOTIF_MATRIX_ROOMID}
+
+volumes:
+  data:

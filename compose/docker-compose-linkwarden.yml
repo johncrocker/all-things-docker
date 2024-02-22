@@ -1,0 +1,41 @@
+version: "3.5"
+services:
+  postgres:
+    container_name: postgres
+    env_file:
+      - ${DOCKER_ENV}/linkwarden.env
+    image: postgres:alpine
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=alpine"
+
+  linkwarden:
+    container_name: linkwarden
+    env_file:
+      - ${DOCKER_ENV}/linkwarden.env
+    environment:
+     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    restart: unless-stopped
+    image: ghcr.io/linkwarden/linkwarden:latest
+    ports:
+      - 3015:3000
+    volumes:
+      - data:/data/data
+    depends_on:
+      - postgres
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - homepage.group=Containers
+      - homepage.name=Limkwarden
+      - homepage.href=http://linkwarden.lan
+      - homepage.description=Linkwarden webpage management service
+
+volumes:
+  data:
+  pgdata:

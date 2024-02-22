@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+   vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    ports:
+      - "3021:3021"
+      - "8200:8200"
+    restart: unless-stopped
+    environment:
+      - VAULT_ADDR=http://192.168.1.201:3021
+    volumes:
+      - logs:/vault/logs
+      - file:/vault/file
+      - config:/vault/config
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config=/vault/config/local.json
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Vault
+      - homepage.href=http://192.168.1.201:3021/
+      - homepage.description=Vault Secret Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  logs:
+  file:
+  config:

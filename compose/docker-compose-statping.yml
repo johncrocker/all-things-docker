@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  statping:
+    image: adamboutcher/statping-ng:latest
+    container_name: statping
+    environment:
+      - TZ=${TZ}
+    restart: unless-stopped
+    ports:
+      - 3010:8080
+    volumes:
+      - "statping-data:/app"
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Statping-ng
+      - homepage.href=http://statping.lan
+      - homepage.description=Statping Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  statping-data:

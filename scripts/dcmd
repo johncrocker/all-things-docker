@@ -30,6 +30,7 @@ function getdockerlabel() {
 	echo "$labelvalue"
 }
 
+
 function dockerstats() {
 	projectname=""
 	containername=""
@@ -46,6 +47,20 @@ function dockerstats() {
        docker container stats $containerids --no-stream \
             --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" \
             | (read -r; printf "%s\n" "$REPLY"; sort -k $3 )
+}
+
+function dockerstatsall() {
+        projectnames=()
+        containerids=()
+
+        for containerid in $(docker ps -q); do
+            projectnames+=("$(getdockerlabel "com.docker.compose.project" $containerid)")
+            containerids+=("$containerid")
+        done
+
+       docker container stats --all --no-stream \
+            --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" \
+            | (read -r; printf "%s\n" "$REPLY"; sort -k $1 )
 }
 
 function dockerexec() {
@@ -271,16 +286,11 @@ function helptext() {
 	echoinfo "  up - Starts a stack in detached mode"
         echoinfo "  shell - Runs an interactive shell inside a container"
         echoinfo "  logs - Shows the logs for a given container"
-	echoinfo "  stats - Output Docker stats on all containers"
+	echoinfo "  stats - Output Docker stats on all containers (specifiy only stats as parameter for global stats)"
 	echoinfo ""
 }
 
 banner
-
-if [ $# -lt 2 ]; then
-	helptext
-	exit 1
-fi
 
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
 	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
@@ -301,6 +311,16 @@ export DOCKER_GATEWAY_HOST=$(ip addr show dev eth0 | grep 'state UP' -A2 | tail 
 export PUID="$UID"
 export PGID=$(getent group docker | cut -d: -f3)
 export PGID=$(getent group "$USER" | cut -d: -f3)
+
+if [ "$1" = "stats" ]; then
+	dockerstatsall "1"
+	exit 0
+fi
+
+if [ $# -lt 2 ]; then
+        helptext
+        exit 1
+fi
 
 project="$1"
 composefilename="docker-compose-$project.yml"

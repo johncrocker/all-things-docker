@@ -137,7 +137,7 @@ function removecontainers {
 }
 
 function murdercontainers {
-	echo "CAUTION: This deletes everything relatd to this stack"
+	echo "CAUTION: This deletes everything related to this stack"
 	echo "(Volumes, Contaimers, Images, Networks etc)"
 	echo "Are you sure?"
 

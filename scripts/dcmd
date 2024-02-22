@@ -31,7 +31,19 @@ function getdockerlabel() {
 }
 
 function dockerstats() {
-	docker container stats --all --no-stream \
+	projectname=""
+	containername=""
+        containerids=""
+
+        for containerid in $(dockercompose $1 $2 ps -q); do
+            projectname="$(getdockerlabel "com.docker.compose.project" $containerid)"
+            #containername="$containername $(getcontainername $containerid)"
+            containerids="$containerids$containerid "
+        done
+
+       echo "Stack name: $projectname"
+       echo ""
+       docker container stats $containerids --no-stream \
             --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" \
             | (read -r; printf "%s\n" "$REPLY"; sort -k $3 )
 }
@@ -85,7 +97,7 @@ function updatecheck() {
 		status="no-change"
 		imagename=$(getdockerimagename "$containerid")
 		currenthash=$(docker image ls "$imagename" --quiet)
-		result=$(docker pull "$imagename")
+			result=$(docker pull "$imagename")
 		newhash=$(docker image ls "$imagename" --quiet)
 
 		if [[ "$currenthash" != "$newhash" ]]; then

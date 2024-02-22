@@ -64,7 +64,7 @@ function dockerlogs() {
 }
 
 function getdockerimagename() {
-	container="$1"x
+	container="$1"
 	template="{{ index .Config.Image }}"
 	imagename=$(docker inspect -f "$template" $container)
 	echo "$imagename"

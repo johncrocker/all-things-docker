@@ -42,6 +42,7 @@ function dockerstats() {
             containerids="$containerids$containerid "
         done
 
+
        echo "Stack name: $projectname"
        echo ""
        docker container stats $containerids --no-stream \
@@ -59,11 +60,11 @@ index=1
 echo $(
 while IFS= read -r line; do
     if [ "$index" = "1" ]; then
-      echo -e "STACK\t$line"
+      printf "%s\t\t%s\n" "STACK" "$line"
     else
       containerid=$(echo $line | cut -d$' ' -f1)
       projectname=("$(getdockerlabel "com.docker.compose.project" $containerid)")
-      echo -e "$projectname\t$line"
+      printf "%s\t%s\n" "$projectname" "$line"
     fi
 
     index=$((index+1))

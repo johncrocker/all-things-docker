@@ -52,9 +52,11 @@ function dockerstats() {
 function dockerstatsall() {
 
 IFS=;
-statscmd=`docker container stats --all --no-trunc --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}" | (read -r; printf "%s\n" "$REPLY"; sort -k 1 ) `
+statscmd=`docker container stats --all --no-trunc --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}" `
 
 index=1
+
+echo $(
 while IFS= read -r line; do
     if [ "$index" = "1" ]; then
       echo -e "STACK\t$line"
@@ -66,7 +68,7 @@ while IFS= read -r line; do
 
     index=$((index+1))
 done <<< "$statscmd"
-
+) | (read -r; printf "%s\n" "$REPLY"; sort -k 1 ) 
 }
 
 function dockerexec() {

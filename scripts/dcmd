@@ -30,73 +30,79 @@ function getdockerlabel() {
 	echo "$labelvalue"
 }
 
-
 function dockerstats() {
 	projectname=""
 	containername=""
-        containerids=""
+	containerids=""
 
-        for containerid in $(dockercompose $1 $2 ps -q); do
-            projectname="$(getdockerlabel "com.docker.compose.project" $containerid)"
-            #containername="$containername $(getcontainername $containerid)"
-            containerids="$containerids$containerid "
-        done
+	for containerid in $(dockercompose $1 $2 ps -q); do
+		projectname="$(getdockerlabel "com.docker.compose.project" $containerid)"
+		#containername="$containername $(getcontainername $containerid)"
+		containerids="$containerids$containerid "
+	done
 
-
-       echo "Stack name: $projectname"
-       echo ""
-       docker container stats $containerids --no-stream \
-            --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" \
-            | (read -r; printf "%s\n" "$REPLY"; sort -k $3 )
+	echo "Stack name: $projectname"
+	echo ""
+	docker container stats $containerids --no-stream \
+		--format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" |
+		(
+			read -r
+			printf "%s\n" "$REPLY"
+			sort -k $3
+		)
 }
 
 function dockerstatsall() {
 
-IFS=;
-statscmd=`docker container stats --all --no-trunc --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}" `
+	IFS=
+	statscmd=$(docker container stats --all --no-trunc --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}")
 
-index=1
+	index=1
 
-echo $(
-while IFS= read -r line; do
-    if [ "$index" = "1" ]; then
-      printf "%s\t\t%s\n" "STACK" "$line"
-    else
-      containerid=$(echo $line | cut -d$' ' -f1)
-      projectname=("$(getdockerlabel "com.docker.compose.project" $containerid)")
-      printf "%s\t%s\n" "$projectname" "$line"
-    fi
+	echo $(
+		while IFS= read -r line; do
+			if [ "$index" = "1" ]; then
+				printf "%s\t\t%s\n" "STACK" "$line"
+			else
+				containerid=$(echo $line | cut -d$' ' -f1)
+				projectname=("$(getdockerlabel "com.docker.compose.project" $containerid)")
+				printf "%s\t%s\n" "$projectname" "$line"
+			fi
 
-    index=$((index+1))
-done <<< "$statscmd"
-) | (read -r; printf "%s\n" "$REPLY"; sort -k 1 ) 
+			index=$((index + 1))
+		done <<<"$statscmd"
+	) | (
+		read -r
+		printf "%s\n" "$REPLY"
+		sort -k 1
+	)
 }
 
 function dockerexec() {
 	containername="$4"
 
-        if [ "$containername" = "" ]; then
-        	firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
- 		containername=$(getcontainername $firstcontainer)
+	if [ "$containername" = "" ]; then
+		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
+		containername=$(getcontainername $firstcontainer)
 		echo "Running inside $containername"
 		docker exec -it $containername $3 "${@:4}"
 	else
 		echo "Running inside $containername"
-	      	docker exec -it $containername $3 "${@:5}"
+		docker exec -it $containername $3 "${@:5}"
 	fi
 }
 
 function dockerlogs() {
-        containername="$3"
-        if [ "$containername" = "" ]; then
-                firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
-                containername=$(getcontainername $firstcontainer)
-                echo "Showing logs for $containername"
-                docker logs $containername "${@:3}"
-        else
-                echo "Showing logs for $containername"
-                docker logs $containername "${@:4}"
-        fi
+	containername="$3"
+	if [ "$containername" = "" ]; then
+		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
+		containername=$(getcontainername $firstcontainer)
+		echo "Showing logs for $containername"
+		docker logs $containername "${@:3}"
+	else
+		echo "Showing logs for $containername"
+		docker logs $containername "${@:4}"
+	fi
 }
 
 function getdockerimagename() {
@@ -121,7 +127,7 @@ function updatecheck() {
 		status="no-change"
 		imagename=$(getdockerimagename "$containerid")
 		currenthash=$(docker image ls "$imagename" --quiet)
-			result=$(docker pull "$imagename")
+		result=$(docker pull "$imagename")
 		newhash=$(docker image ls "$imagename" --quiet)
 
 		if [[ "$currenthash" != "$newhash" ]]; then
@@ -293,8 +299,8 @@ function helptext() {
 	echoinfo "  update - Updates and restarts containers from repo"
 	echoinfo "  updatecheck - Checks which containers need updating from repo"
 	echoinfo "  up - Starts a stack in detached mode"
-        echoinfo "  shell - Runs an interactive shell inside a container"
-        echoinfo "  logs - Shows the logs for a given container"
+	echoinfo "  shell - Runs an interactive shell inside a container"
+	echoinfo "  logs - Shows the logs for a given container"
 	echoinfo "  stats - Output Docker stats on all containers (specifiy only stats as parameter for global stats)"
 	echoinfo ""
 }
@@ -327,8 +333,8 @@ if [ "$1" = "stats" ]; then
 fi
 
 if [ $# -lt 2 ]; then
-        helptext
-        exit 1
+	helptext
+	exit 1
 fi
 
 project="$1"
@@ -349,10 +355,10 @@ if [ $# -gt 2 ]; then
 			composefile="$DOCKER_COMPOSE_FOLDER/$composefilename"
 			shift
 			;;
-                -s=* | --sort=*)
-                        sortcolumn="${i#*=}"
-                        shift
-                        ;;
+		-s=* | --sort=*)
+			sortcolumn="${i#*=}"
+			shift
+			;;
 		-* | --*)
 			echoerr "Unknown argument: $i"
 			exit 1
@@ -392,15 +398,15 @@ if [ -e "$composefile" ]; then
 	debug)
 		debugcontainers $stackname $composefile
 		;;
-        shell)
-                dockerexec $stackname $composefile "/bin/sh" $3  "${@:4}"
-                ;;
-        logs)
-               dockerlogs $stackname $composefile $3 "${@:4}"
-               ;;
-        stats)
-              dockerstats $stackname $composefile $sortcolumn
-              ;;
+	shell)
+		dockerexec $stackname $composefile "/bin/sh" $3 "${@:4}"
+		;;
+	logs)
+		dockerlogs $stackname $composefile $3 "${@:4}"
+		;;
+	stats)
+		dockerstats $stackname $composefile $sortcolumn
+		;;
 	rm)
 		removecontainers $stackname $composefile
 		;;

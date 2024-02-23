@@ -50,17 +50,23 @@ function dockerstats() {
 }
 
 function dockerstatsall() {
-        projectnames=()
-        containerids=()
 
-        for containerid in $(docker ps -q); do
-            projectnames+=("$(getdockerlabel "com.docker.compose.project" $containerid)")
-            containerids+=("$containerid")
-        done
+IFS=;
+statscmd=`docker container stats --all --no-trunc --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}" | (read -r; printf "%s\n" "$REPLY"; sort -k 1 ) `
 
-       docker container stats --all --no-stream \
-            --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" \
-            | (read -r; printf "%s\n" "$REPLY"; sort -k $1 )
+index=1
+while IFS= read -r line; do
+    if [ "$index" = "1" ]; then
+      echo -e "STACK\t$line"
+    else
+      containerid=$(echo "$line" | cut -d$'\t' -f1)
+      projectname=("$(getdockerlabel "com.docker.compose.project" $containerid)")
+      echo -e "$projectname\t$line"
+    fi
+
+    index=$((index+1))
+done <<< "$statscmd"
+
 }
 
 function dockerexec() {

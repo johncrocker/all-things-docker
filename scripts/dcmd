@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function echoerr() {
+function echoerr() { 
 	printf "%s\n" "$*" >&2
 }
 
@@ -11,10 +11,8 @@ function echoinfo() {
 function loadenvfile() {
 	envfile="$1"
 	if [ -e "$envfile" ]; then
-		echoinfo "Reading Environment file: $envfile"
-		set -a
+		echoinfo "Reading Environment file: $envfile"	set -a
 		source "$envfile"
-		set +a
 	fi
 }
 
@@ -30,33 +28,58 @@ function getdockerlabel() {
 	echo "$labelvalue"
 }
 
-function dockerstats() {
+function dockerstat() {
 	projectname=""
-	containername=""
+	containername""
 	containerids=""
 
-	for containerid in $(dockercompose $1 $2 ps -q); do
-		projectname="$(getdockerlabel "com.docker.compose.project" $containerid)"
-		#containername="$containername $(getcontainername $containerid)"
-		containerids="$containerids$containerid "
+	for containerid in $(dockercompose $1 $2 ps -q) 
+	do
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)"
+#containername=$(getcontainername $containerid)
+#containerids="$containerids $containerid"
 	done
 
 	echo "Stack name: $projectname"
 	echo ""
-	docker container stats $containerids --no-stream \
-		--format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" |
-		(
-			read -r
-			printf "%s\n" "$REPLY"
-			sort -k $3
-		)
+		docker container stats $containerids --no-stream --format  "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" |
+			read  (
+			printf "%\n" "$REPLY"
+	sort -k $3		)
+}
+
+function generatestatstemplate() {
+	template="$1"
+	reserved=("Stack")
+	if [ "$template" = "" ]; then
+		template="Stack,Name,CPUPerc,MemUsage,BlockIO,NetIO"
+	fi
+
+	printf "table {{.ID}}"
+	IFS=',' read -ra columns <<< "$template"
+	for column in "${columns[@]}"
+	do
+		if [[ ! "${reserved[@]}" =~ "${column}" ]]; then
+			printf "\t{{.$column}}"
+		fi
+	done
+}
+
+function writestatsline() {
+	line="$1"
+	template="$2"
+	IFS=',' read -ra columns <<< "$template"
+	index=1
+for column in "${columns[@]}"
+do
+echo "$line" | sed 's/  */ /g' | cut -d$'\t' -f $index
+index=$((index+1))
+done
 }
 
 function dockerstatsall() {
-
-	IFS=
-	statscmd=$(docker container stats --all --no-trunc --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}")
-
+	template=$(generatestatstemplate "$2")	IFS=
+	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template")
 	index=1
 
 	echo $(
@@ -66,12 +89,12 @@ function dockerstatsall() {
 			else
 				containerid=$(echo $line | cut -d$' ' -f1)
 				projectname=("$(getdockerlabel "com.docker.compose.project" $containerid)")
-				printf "%s\t%s\n" "$projectname" "$line"
+				writestatsline "$projectname\t$line"
 			fi
 
 			index=$((index + 1))
 		done <<<"$statscmd"
-	) | (
+n	) | (
 		read -r
 		printf "%s\n" "$REPLY"
 		sort -k 1
@@ -81,7 +104,7 @@ function dockerstatsall() {
 function dockerexec() {
 	containername="$4"
 
-	if [ "$containername" = "" ]; then
+l	if [ "$containername" = "" ]; then
 		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
 		containername=$(getcontainername $firstcontainer)
 		echo "Running inside $containername"
@@ -179,6 +202,7 @@ function removecontainers {
 }
 
 function murdercontainers {
+
 	echo "CAUTION: This deletes everything related to this stack"
 	echo "(Volumes, Contaimers, Images, Networks etc)"
 	echo "Are you sure?"
@@ -328,7 +352,7 @@ export PGID=$(getent group docker | cut -d: -f3)
 export PGID=$(getent group "$USER" | cut -d: -f3)
 
 if [ "$1" = "stats" ]; then
-	dockerstatsall "1"
+	dockerstatsall "1"  "$2"
 	exit 0
 fi
 

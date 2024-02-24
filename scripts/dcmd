@@ -2,13 +2,14 @@
 
 function dockerstatsall() {
 	template="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"
+template="table {{.Name}}"
 	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template")
 	index=1
 
 	echo $(
 		while IFS= read -r line; do
 			if [ "$index" = "1" ]; then
-				printf "%s\t\t%s\n" "STACK" "$line"
+				printf "%s\t%s\n" "STACK" "$line"
 			else
 				containerid="$(echo $line | cut -d$' ' -f1)"
 				projectname=$(getdockerlabel "com.docker.compose.project" $containerid)

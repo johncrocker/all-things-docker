@@ -1,11 +1,17 @@
 #!/bin/bash
 
+function gettemplate() {
+	if [ "$1" = "" ]; then
+		echo  "Stack,Name,CPUPerc,MemUsage,BlockIO,NetIO"
+	else
+		echo "$1"
+	fi
+}
+
 function generatestatstemplate() {
 	template="$1"
 	reserved=("Stack")
-	if [ "$template" = "" ]; then
-		template="Stack,Name,CPUPerc,MemUsage,BlockIO,NetIO"
-	fi
+	template=$(gettemplate "$1")
 
 	printf "table {{.ID}}"
 	IFS=',' read -ra columns <<< "$template"
@@ -24,13 +30,14 @@ function writestatsline() {
 	index=1
 for column in "${columns[@]}"
 do
-echo "$line" | sed 's/  */ /g' | cut -d$'\t' -f $index
+echo "$line"  | cut -d$'\t' -f $index
 index=$((index+1))
 done
 }
 
 function dockerstatsall() {
 	template=$(generatestatstemplate "$2")	IFS=
+echo "!$template"
 	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template")
 	index=1
 
@@ -42,6 +49,7 @@ function dockerstatsall() {
 				containerid="$(echo $line | cut -d$' ' -f1)"
 				projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
 				writestatsline "$projectname\t$line"
+				#echo $line
 			fi
 
 			index=$((index + 1))

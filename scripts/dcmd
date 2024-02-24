@@ -99,8 +99,20 @@ function dockerstat() {
 	docker container stats $containerids --no-stream --format  "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" 
 }
 
+function gettemplatemap() {
+ 	template="$1"
+        reserved=("Stack")
+        if [ "$template" = "" ]; then
+                template="Stack,Name,CPUPerc,MemUsage,BlockIO,NetIO"
+        fi
+
+    	IFS=',' read -ra columns <<< "$template"
+    	echo  "${columns[@]}"
+}
+
 function generatestatstemplate() {
-	template="$1"
+	template=(gettemplàtemap "$1")
+
 	reserved=("Stack")
 	if [ "$template" = "" ]; then
 		template="Stack,Name,CPUPerc,MemUsage,BlockIO,NetIO"
@@ -110,9 +122,7 @@ function generatestatstemplate() {
 	IFS=',' read -ra columns <<< "$template"
 	for column in "${columns[@]}"
 	do
-		if [  "${reserved[@]}" =~ "${column}" ]; then
-			printf "\t{{.$column}}"
-		fi
+		printf "\t{{.$column}}"
 	done
 }
 
@@ -307,10 +317,6 @@ function genkeys() {
 	echokeyfile "$3" "$4/global.env"
 	echokeyfile "$3" "$4/$6.env"
 	echokeyfile "$3" "$5/$6.env"
-}
-
-function dockerstatsall() {
-echo 
 }
 
 function banner() {

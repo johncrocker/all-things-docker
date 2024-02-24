@@ -1,5 +1,58 @@
 #!/bin/bash
 
+function generatestatstemplate() {
+	template="$1"
+	reserved=("Stack")
+	if [ "$template" = "" ]; then
+		template="Stack,Name,CPUPerc,MemUsage,BlockIO,NetIO"
+	fi
+
+	printf "table {{.ID}}"
+	IFS=',' read -ra columns <<< "$template"
+	for column in "${columns[@]}"
+	do
+		if [[ ! "${reserved[@]}" =~ "${column}" ]]; then
+			printf "\t{{.$column}}"
+		fi
+	done
+}
+
+function writestatsline() {
+	line="$1"
+	template="$2"
+	IFS=',' read -ra columns <<< "$template"
+	index=1
+for column in "${columns[@]}"
+do
+echo "$line" | sed 's/  */ /g' | cut -d$'\t' -f $index
+index=$((index+1))
+done
+}
+
+function dockerstatsall() {
+	template=$(generatestatstemplate "$2")	IFS=
+	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template")
+	index=1
+
+	echo $(
+		while IFS= read -r line; do
+			if [ "$index" = "1" ]; then
+				printf "%s\t\t%s\n" "STACK" "$line"
+			else
+				containerid="$(echo $line | cut -d$' ' -f1)"
+				projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+				writestatsline "$projectname\t$line"
+			fi
+
+			index=$((index + 1))
+		done <<<"$statscmd"
+	) | (
+		read -r
+		printf "%s\n" "$REPLY"
+		sort -k 1
+	)
+}
+
 function echoerr() { 
 	printf "%s\n" "$*" >&2
 }

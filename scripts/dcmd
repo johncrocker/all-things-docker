@@ -99,36 +99,7 @@ function dockerstat() {
 	docker container stats $containerids --no-stream --format  "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" 
 }
 
-function gettemplatemap() {
- 	template="$1"
-        reserved=("Stack")
-        if [ "$template" = "" ]; then
-                template="Stack,Name,CPUPerc,MemUsage,BlockIO,NetIO"
-        fi
-
-    	IFS=',' read -ra columns <<< "$template"
-    	echo  "${columns[@]}"
-}
-
-function generatestatstemplate() {
-	template=(gettemplàtemap "$1")
-
-	reserved=("Stack")
-	if [ "$template" = "" ]; then
-		template="Stack,Name,CPUPerc,MemUsage,BlockIO,NetIO"
-	fi
-
-	printf "table {{.ID}}"
-	IFS=',' read -ra columns <<< "$template"
-	for column in "${columns[@]}"
-	do
-		printf "\t{{.$column}}"
-	done
-}
-
 function dockerexec() {
-	containername="$4"
-
 	if [ "$containername" = "" ]; then
 		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
 		containername=$(getcontainername $firstcontainer)

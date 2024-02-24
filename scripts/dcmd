@@ -1,43 +1,7 @@
 #!/bin/bash
 
-function gettemplate() {
-	if [ "$1" = "" ]; then
-		echo  "Stack,Name,CPUPerc,MemUsage,BlockIO,NetIO"
-	else
-		echo "$1"
-	fi
-}
-
-function generatestatstemplate() {
-	template="$1"
-	reserved=("Stack")
-	template=$(gettemplate "$1")
-
-	printf "table {{.ID}}"
-	IFS=',' read -ra columns <<< "$template"
-	for column in "${columns[@]}"
-	do
-		if [[ ! "${reserved[@]}" =~ "${column}" ]]; then
-			printf "\t{{.$column}}"
-		fi
-	done
-}
-
-function writestatsline() {
-	line="$1"
-	template="$2"
-	IFS=',' read -ra columns <<< "$template"
-	index=1
-for column in "${columns[@]}"
-do
-echo "$line"  | cut -d$'\t' -f $index
-index=$((index+1))
-done
-}
-
 function dockerstatsall() {
-	template=$(generatestatstemplate "$2")	IFS=
-echo "!$template"
+	template="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"
 	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template")
 	index=1
 
@@ -48,8 +12,7 @@ echo "!$template"
 			else
 				containerid="$(echo $line | cut -d$' ' -f1)"
 				projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
-				writestatsline "$projectname\t$line"
-				#echo $line
+				printf "%s\t%s\n" "$projectname" "$line"
 			fi
 
 			index=$((index + 1))

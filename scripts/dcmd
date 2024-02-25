@@ -324,11 +324,11 @@ if [ "$1" != "" ]; then
 	stats)
 		dockerstatsall "1" "$2"
 		exit 0
-	;;
+		;;
 	ps)
 		dockerpsall "$2"
 		exit 0
-	;;
+		;;
 	esac
 fi
 
@@ -366,7 +366,7 @@ if [ $# -gt 2 ]; then
 		*) ;;
 		esac
 	done
-i
+fi
 
 if [ "$cmd" = "up" ]; then
 	params="-d"

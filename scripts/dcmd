@@ -3,27 +3,26 @@
 function dockerstatsall() {
 	template="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"
 
-	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template" )
+	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template")
 	index=1
 
-	while IFS="" read -r line
-	do
+	while IFS="" read -r line; do
 
-			if [ "$index" = "1" ]; then
-				printf $"%s\t\t%s\n" "STACK" "$line"
-			else
-				containerid="$(echo $line | cut -d$' ' -f1)"
-				projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
-				printf "%s\t%s\n" "$projectname" "$line"
-			fi
+		if [ "$index" = "1" ]; then
+			printf $"%s\t\t%s\n" "STACK" "$line"
+		else
+			containerid="$(echo $line | cut -d$' ' -f1)"
+			projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+			printf "%s\t%s\n" "$projectname" "$line"
+		fi
 
-			index=$((index + 1))
-	done <<< "$statscmd"
+		index=$((index + 1))
+	done <<<"$statscmd"
 
 	unset ILS
 }
 
-function echoerr() { 
+function echoerr() {
 	printf "%s\n" "$*" >&2
 }
 
@@ -34,7 +33,7 @@ function echoinfo() {
 function loadenvfile() {
 	envfile="$1"
 	if [ -e "$envfile" ]; then
-		echoinfo "Reading Environment file: $envfile"	
+		echoinfo "Reading Environment file: $envfile"
 		set -a
 		source "$envfile"
 	fi
@@ -57,16 +56,15 @@ function dockerstat() {
 	containername=""
 	containerids=""
 
-	for containerid in $(dockercompose $1 $2 ps -q) 
-	do
+	for containerid in $(dockercompose $1 $2 ps -q); do
 		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
 		ontainername=$(getcontainername $containerid)
-		containerids="$containerids $containerid"																																																																																																									
+		containerids="$containerids $containerid"
 	done
 
 	echo "Stack name: $projectname"
 	echo ""
-	docker container stats $containerids --no-stream --format  "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}" 
+	docker container stats $containerids --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}"
 }
 
 function dockerexec() {
@@ -317,7 +315,7 @@ export PGID=$(getent group docker | cut -d: -f3)
 export PGID=$(getent group "$USER" | cut -d: -f3)
 
 if [ "$1" = "stats" ]; then
-	dockerstatsall "1"  "$2" 
+	dockerstatsall "1" "$2"
 	exit 0
 fi
 

@@ -2,23 +2,23 @@
 
 function dockerstatsall() {
 	template="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"
-template="table {{.Name}}"
-	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template")
+
+	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template" )
 	index=1
 
-#	echo $(
-		for line in $statscmd; do
+	while IFS="" read -r line
+	do
+
 			if [ "$index" = "1" ]; then
 				printf $"%s\t\t%s\n" "STACK" "$line"
 			else
-							containerid="$(echo $line | cut -d$' ' -f1)"
+				containerid="$(echo $line | cut -d$' ' -f1)"
 				projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
 				printf "%s\t%s\n" "$projectname" "$line"
 			fi
 
 			index=$((index + 1))
-		done
-	#) | sort
+	done <<< "$statscmd"
 
 	unset ILS
 }
@@ -317,7 +317,7 @@ export PGID=$(getent group docker | cut -d: -f3)
 export PGID=$(getent group "$USER" | cut -d: -f3)
 
 if [ "$1" = "stats" ]; then
-	dockerstatsall "1"  "$2"
+	dockerstatsall "1"  "$2" 
 	exit 0
 fi
 

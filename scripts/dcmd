@@ -1,5 +1,10 @@
 #!/bin/bash
 
+function dockerpsall() {
+
+	docker ps -s --no-trunc --all --format "table {{.Names}}\t{{.Status}}\t{{.Size}}" | sort
+}
+
 function dockerstatsall() {
 	template="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"
 
@@ -314,9 +319,17 @@ export PUID="$UID"
 export PGID=$(getent group docker | cut -d: -f3)
 export PGID=$(getent group "$USER" | cut -d: -f3)
 
-if [ "$1" = "stats" ]; then
-	dockerstatsall "1" "$2"
-	exit 0
+if [ "$1" != "" ]; then
+	case $1 in
+	stats)
+		dockerstatsall "1" "$2"
+		exit 0
+	;;
+	ps)
+		dockerpsall "$2"
+		exit 0
+	;;
+	esac
 fi
 
 if [ $# -lt 2 ]; then
@@ -353,7 +366,7 @@ if [ $# -gt 2 ]; then
 		*) ;;
 		esac
 	done
-fi
+i
 
 if [ "$cmd" = "up" ]; then
 	params="-d"

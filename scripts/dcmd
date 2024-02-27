@@ -1,9 +1,9 @@
 #!/bin/bash
 
 function cleardocker() {
-#docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
-docker image prune -a --filter "until=24h" -f
- }
+	#docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+	docker image prune -a --filter "until=24h" -f
+}
 
 function dockerpsall() {
 

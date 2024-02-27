@@ -1,5 +1,10 @@
 #!/bin/bash
 
+function cleardocker() {
+#docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+docker image prune -a --filter "until=24h" -f
+ }
+
 function dockerpsall() {
 
 	template="$1"
@@ -331,11 +336,15 @@ export PGID=$(getent group "$USER" | cut -d: -f3)
 
 if [ "$1" != "" ]; then
 	case $1 in
+	tidy)
+		cleardocker
+		exit 0
+		;;
 	stats)
 		dockerstatsall "$2" | sort
 		exit 0
 		;;
-		ps)
+	ps)
 		dockerpsall "$2" | sort
 		exit 0
 		;;

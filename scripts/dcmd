@@ -5,8 +5,8 @@ function bulkexecute() {
 
 	for containerid in $(docker ps -a -q); do
 		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
-		echo "dcmd $projectname $1"
-	done | sort
+		echo "dcmd ${projectname/-stack/} $1"
+	done | sort | uniq
 	echo ""
 }
 

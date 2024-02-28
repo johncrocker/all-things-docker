@@ -1,5 +1,15 @@
 #!/bin/bash
 
+function bulkexecute() {
+	echo "#!/bin/bash"
+
+	for containerid in $(docker ps -a -q); do
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		echo "dcmd $projectname $1"
+	done | sort
+	echo ""
+}
+
 function cleardocker() {
 	#docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
 	docker image prune -a --filter "until=24h" -f
@@ -44,6 +54,7 @@ function dockerstatsall() {
 
 function echoerr() {
 	printf "%s\n" "$*" >&2
+
 }
 
 function echoinfo() {
@@ -309,10 +320,11 @@ function helptext() {
 	echoinfo "  shell - Runs an interactive shell inside a container"
 	echoinfo "  logs - Shows the logs for a given container"
 	echoinfo "  stats - Output Docker stats on all containers (specifiy only stats as parameter for global stats)"
+	echoinfo "  tidy - Tidies unused containers up"
+	echoinfo "  bulk - Performs bulk tasks against all containers"
+	echoinfo "  ps - Display global process information"
 	echoinfo ""
 }
-
-banner
 
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
 	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
@@ -336,6 +348,10 @@ export PGID=$(getent group "$USER" | cut -d: -f3)
 
 if [ "$1" != "" ]; then
 	case $1 in
+	bulk)
+		bulkexecute "$2"
+		exit 0
+		;;
 	tidy)
 		cleardocker
 		exit 0
@@ -352,6 +368,7 @@ if [ "$1" != "" ]; then
 fi
 
 if [ $# -lt 2 ]; then
+	banner
 	helptext
 	exit 1
 fi

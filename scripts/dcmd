@@ -1,5 +1,24 @@
 #!/bin/bash
 
+function listallstackips {
+
+	printf "%-20s %-20s %s\n" "STACK" "ADDRESS" "CONTAINER"
+
+	for containerid in $(docker ps -q); do
+		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid) imagename=$(getdockerimagename "$containerid")
+		containername=$(getcontainername "$containerid")
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+		workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+
+		if [ "$ipaddress" = "" ]; then
+			ipaddress="0.0.0.0"
+		fi
+
+		printf "%-20s %-20s %s\n" $projectname $ipaddress $containername
+	done
+}
+
 function bulkexecute() {
 	echo "#!/bin/bash"
 
@@ -19,10 +38,28 @@ function dockerpsall() {
 
 	template="$1"
 	if [ "$1" = "" ]; then
-		template="table {{.Names}}\t{{.Status}}\t{{.Size}}"
+		template="table {{.Names}}\t{{.Status}}"
 	fi
 
-	docker ps -s --no-trunc --all --format "$template" | sort
+	pscmd=$(docker ps -s --no-trunc --all --format "$template")
+	index=1
+
+	while IFS="" read -r line; do
+		if [ "$index" = "1" ]; then
+			printf "%s\t\t%s\n" "STACK CONFIG FILE" "$line"
+		else
+			containerid="$(echo $line | cut -d$' ' -f1)"
+			projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+			configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+			workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+			configfile="${configfile/$DOCKER_COMPOSE_FOLDER\//}"
+			printf "%s\t\t%s\n" "$configfile" "$line"
+		fi
+
+		index=$((index + 1))
+	done <<<"$pscmd"
+
+	unset ILS
 
 }
 
@@ -364,6 +401,10 @@ if [ "$1" != "" ]; then
 		dockerpsall "$2" | sort
 		exit 0
 		;;
+	ip)
+		listallstackips "$2" | sort
+		exit 0
+		;;
 	esac
 fi
 
@@ -420,7 +461,7 @@ if [ -e "$composefile" ]; then
 
 	case $cmd in
 	ip)
-		listcontainerips $stackname $composefile
+		listcontainerips $stackname $composefile | sort
 		;;
 	updatecheck)
 		updatecheck $stackname $composefile
@@ -441,7 +482,7 @@ if [ -e "$composefile" ]; then
 		dockerlogs $stackname $composefile $3 "${@:4}"
 		;;
 	stats)
-		dockerstat $stackname $composefile $sortcolumn
+		dockerstat $stackname $composefile $sortcolumn | sort
 		;;
 	rm)
 		removecontainers $stackname $composefile

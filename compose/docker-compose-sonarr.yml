@@ -11,9 +11,8 @@ services:
     ports:
       - "8989:8989"
     volumes:
-      - "data:/config"
-      - "tvseries:/tv"
-      - "downloads:/downloads"
+      - "config:/config"
+      - "data:/data"
     restart: unless-stopped
     labels:
       - homepage.group=Containers
@@ -26,5 +25,4 @@ services:
 
 volumes:
   data:
-  tvseries:
-  downloads:
+  config:

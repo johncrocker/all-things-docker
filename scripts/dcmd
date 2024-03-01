@@ -153,10 +153,23 @@ function dockerlogs() {
 		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
 		containername=$(getcontainername $firstcontainer)
 		echo "Showing logs for $containername"
-		docker logs $containername "${@:3}"
+		docker logs $containername -details -t "${@:3}"
 	else
 		echo "Showing logs for $containername"
-		docker logs $containername "${@:4}"
+		docker logs $containername --details -t "${@:4}"
+	fi
+}
+
+function dockerlogstail() {
+	containername="$3"
+	if [ "$containername" = "" ]; then
+		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
+		containername=$(getcontainername $firstcontainer)
+		echo "Showing most recent 20 lines of logs for $containername"
+		docker logs $containername --details -t -n 20 "${@:3}"
+	else
+		echo "Showing most recent 20 lines of log for $containername"
+		docker logs $containername --details -t -n 20 "${@:4}"
 	fi
 }
 
@@ -356,10 +369,12 @@ function helptext() {
 	echoinfo "  up - Starts a stack in detached mode"
 	echoinfo "  shell - Runs an interactive shell inside a container"
 	echoinfo "  logs - Shows the logs for a given container"
+	echoinfo "  tail - Shows the most recent 20 lines of a given container log"
 	echoinfo "  stats - Output Docker stats on all containers (specifiy only stats as parameter for global stats)"
 	echoinfo "  tidy - Tidies unused containers up"
 	echoinfo "  bulk - Performs bulk tasks against all containers"
 	echoinfo "  ps - Display global process information"
+	echoinfo "  ip - List all container IP addresses"
 	echoinfo ""
 }
 
@@ -480,6 +495,9 @@ if [ -e "$composefile" ]; then
 		;;
 	logs)
 		dockerlogs $stackname $composefile $3 "${@:4}"
+		;;
+	tail)
+		dockerlogstail $stackname $composefile $3 "${@:4}"
 		;;
 	stats)
 		dockerstat $stackname $composefile $sortcolumn | sort

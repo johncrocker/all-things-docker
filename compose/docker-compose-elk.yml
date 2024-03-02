@@ -1,0 +1,63 @@
+|Tailscale - https://www.tailscale.com
+version: "3.9"
+
+services:
+  elasticseaech:
+    image: elasticsearch:latest
+    container_name: elasicsearch
+    hostname: elasticsearch
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+    environment:
+    labels:
+      - homepage.group=Containersk
+      - homepage.name=ELK - ElaasticSearch
+      - homepage.href=
+      - homepage.description=ElasticSesrch Servicee
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - "com.centurylinklabs.watchtower.enable=false"
+
+  logstash:
+    image: logstash:latest
+    container_name: logstash
+    hostname: logstash
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+    labels:
+      - homepage.group=Containers
+      - homepage.name=ELK - Logstash
+      - homepage.href=     
+      - homepage.description=Logstash Servicee
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - "com.centurylinklabs.watchtower.enable=false"
+
+  kibana:
+    image: kibana:latest
+    container_name: kibana
+    hostname: kibana
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    environment:
+    labels:
+      - homepage.group=Containers
+      - homepage.name=ELK - Kibana 
+      - homepage.href=     
+      - homepage.description=Kibana Servicee
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - "com.centurylinklabs.watchtower.enable=false"
+
+

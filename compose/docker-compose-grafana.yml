@@ -1,0 +1,28 @@
+# Grafana - https://grafana.com/
+version: "3.9"
+
+services:
+  grafana:
+    image: grafana/grafana-enterprise:latest
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    volumes:
+      - storage:/var/lib/grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SERVER_ROOT_URL=http://grafana.lan
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Grafana
+      - homepage.href=http://grafana.lan
+      - homepage.description=Grafana Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - "com.centurylinklabs.watchtower.enable=false"
+
+volumes:
+  storage:

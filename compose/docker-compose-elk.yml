@@ -1,63 +1,89 @@
-|Tailscale - https://www.tailscale.com
+# ElasticSearch Logstash Kibana - 
 version: "3.9"
 
 services:
-  elasticseaech:
-    image: elasticsearch:latest
+  elasticsearch:
+    image: elasticsearch:8.12.2
     container_name: elasicsearch
     hostname: elasticsearch
     restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
     volumes:
+      - elastic-data:/usr/share/elasticsearch/data
     environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    networks:
+      elk-network:
+        ipv4_address: 10.105.1.101
+    ports:
+      - 9200:9200
+      - 9300:9300
     labels:
-      - homepage.group=Containersk
-      - homepage.name=ELK - ElaasticSearch
-      - homepage.href=
-      - homepage.description=ElasticSesrch Servicee
+      - homepage.group=Containers
+      - homepage.name=ELK - ElasticSearch
+      - homepage.href=http://192.168.1.201:9200
+      - homepage.description=ElasticSesrch Service
       - "diun.enable=true"
       - "diun.watch_repo=true"
-      - "diun.include_tags=latest"
+      - "diun.include_tags=8.12.2"
       - "com.centurylinklabs.watchtower.enable=false"
 
   logstash:
-    image: logstash:latest
+    image: logstash:8.12.2
     container_name: logstash
     hostname: logstash
     restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
     environment:
+      - monitoring.elasticsearch.hosts=http://10.105.1.101:9200
+    volumes:
+      - logstash-config:/usr/share/logstash/config/
+    networks:
+      elk-network:
+        ipv4_address: 10.105.1.102
     labels:
       - homepage.group=Containers
       - homepage.name=ELK - Logstash
-      - homepage.href=     
-      - homepage.description=Logstash Servicee
+      - homepage.href=http://10.105.1.102
+      - homepage.description=Logstash Service
       - "diun.enable=true"
       - "diun.watch_repo=true"
-      - "diun.include_tags=latest"
+      - "diun.include_tags=8.12.2"
       - "com.centurylinklabs.watchtower.enable=false"
 
   kibana:
-    image: kibana:latest
+    image: kibana:8.12.2
     container_name: kibana
     hostname: kibana
     restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
     environment:
+      ELASTICSEARCH_HOSTS: '["http://10.105.1.101:9200"]'
+    ports:
+      - 5601:5601
+    volumes:
+      - kibana-config:/usr/share/kibana/config
+      - kibana-data:/usr/share/kibana/data
+    networks:
+      elk-network:
+        ipv4_address: 10.105.1.103
     labels:
       - homepage.group=Containers
-      - homepage.name=ELK - Kibana 
-      - homepage.href=     
-      - homepage.description=Kibana Servicee
+      - homepage.name=ELK - Kibana
+      - homepage.href=http://192.168.1.201:5601
+      - homepage.description=Kibana Service
       - "diun.enable=true"
       - "diun.watch_repo=true"
-      - "diun.include_tags=latest"
+      - "diun.include_tags=8.12.2"
       - "com.centurylinklabs.watchtower.enable=false"
 
+networks:
+  elk-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.105.1.0/24
 
+volumes:
+  elastic-data:
+  logstash-config:
+  kibana-config:
+  kibana-data:

@@ -30,7 +30,6 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
     restart: unless-stopped
-    #password: root123
     environment:
       - GF_SERVER_ROOT_URL=http://grafana.lan
       - GF_INSTALL_PLUGINS=grafana-clock-panel
@@ -87,10 +86,6 @@ services:
       - "diun.watch_repo=true"
       - "diun.include_tags=latest"
       - "com.centurylinklabs.watchtower.enable=true"
-
-networks:
-  monitoring:
-    driver: bridge
 
 volumes:
   prometheus_config:

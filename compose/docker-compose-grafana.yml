@@ -12,7 +12,7 @@ services:
       - prometheus_config:/etc/prometheus/:ro
       - prometheus_data:/prometheus
     restart: unless-stopped
-   labels:
+    labels:
       - homepage.group=Containers
       - homepage.name=Prometheus
       - homepage.href=http://192.168.1.201:9090
@@ -34,7 +34,7 @@ services:
     environment:
       - GF_SERVER_ROOT_URL=http://grafana.lan
       - GF_INSTALL_PLUGINS=grafana-clock-panel
-   labels:
+    labels:
       - homepage.group=Containers
       - homepage.name=Grafana
       - homepage.href=http://grafana.lan
@@ -66,9 +66,9 @@ services:
     container_name: cadvisor
     command:
       - '-port=8098'
-   ports:
-     - '8098:8098'
-   volumes:
+    ports:
+      - '8098:8098'
+    volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro

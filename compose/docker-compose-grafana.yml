@@ -32,7 +32,7 @@ services:
     restart: unless-stopped
     environment:
       - GF_SERVER_ROOT_URL=http://grafana.lan
-      - GF_INSTALL_PLUGINS=grafana-clock-panel
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-clock-panel
     labels:
       - homepage.group=Containers
       - homepage.name=Grafana
@@ -48,6 +48,8 @@ services:
     container_name: node_exporter
     command: '--path.rootfs=/host'
     pid: host
+    ports:
+       - 9100:9100
     restart: unless-stopped
     volumes:
       - /:/host:ro,rslave
@@ -92,9 +94,10 @@ services:
     hostname: prometheus-exporter
     image: ekofr/pihole-exporter:latest
     restart: unless-stopped
-    network_mode: "host"
-#    ports:
-#      - 9617:9617
+    volumes:
+      - /etc/hosts:/etc/hosts:ro
+    ports:
+      - 9617:9617
     environment:
       - PORT=9617
       - INTERVAL=10s

@@ -7,8 +7,8 @@ services:
     container_name: metube
     restart: unless-stopped
     environment:
-      - UID:${UID}
-      - GID:${GID}
+      - UID:${PUID}
+      - GID:${PGID}
       - TZ:${TZ}
     ports:
       - "3014:8081"

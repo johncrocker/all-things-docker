@@ -29,6 +29,23 @@ function bulkexecute() {
 	echo ""
 }
 
+function dockerinspect() {
+	containername="$3"
+	template="$4"
+
+	if [ "$containername" = "" ]; then
+		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
+		containername=$(getcontainername $firstcontainer)
+	fi
+
+	if [ "$template" = "" ]; then
+		docker inspect --type=container --size -f "json" "$containername" | jq
+	else
+		docker inspect --type=container --size -f "{{json $template}}" "$containername" | jq
+	fi
+
+}
+
 function cleardocker() {
 	#docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
 	docker image prune -a --filter "until=24h" -f
@@ -372,6 +389,7 @@ function helptext() {
 	echoinfo "  tail - Shows the most recent 20 lines of a given container log"
 	echoinfo "  stats - Output Docker stats on all containers (specifiy only stats as parameter for global stats)"
 	echoinfo "  tidy - Tidies unused containers up"
+	echoinfov"  info - Inspects a container"
 	echoinfo "  bulk - Performs bulk tasks against all containers"
 	echoinfo "  ps - Display global process information"
 	echoinfo "  ip - List all container IP addresses"
@@ -498,6 +516,9 @@ if [ -e "$composefile" ]; then
 		;;
 	tail)
 		dockerlogstail $stackname $composefile $3 "${@:4}"
+		;;
+	info)
+		dockerinspect $stackname $composefile $3 "${@:4}"
 		;;
 	stats)
 		dockerstat $stackname $composefile $sortcolumn | sort

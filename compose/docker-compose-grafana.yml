@@ -87,6 +87,29 @@ services:
       - "diun.include_tags=latest"
       - "com.centurylinklabs.watchtower.enable=true"
 
+  prometheus-exporter:
+    container_name: prometheus-exporter
+    hostname: prometheus-exporter
+    image: ekofr/pihole-exporter:latest
+    restart: unless-stopped
+    network_mode: "host"
+#    ports:
+#      - 9617:9617
+    environment:
+      - PORT=9617
+      - INTERVAL=10s
+      - PIHOLE_API_TOKEN=${PIHOLE_API_TOKEN}
+      - PIHOLE_HOSTNAME=pihole.lan
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Prometheus Exporter
+      - homepage.href=http://192.168.1.201:9617
+      - homepage.description=Prometheus Exporter Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - "com.centurylinklabs.watchtower.enable=true"
+
 volumes:
   prometheus_config:
   prometheus_data:

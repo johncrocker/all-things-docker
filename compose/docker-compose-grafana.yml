@@ -1,4 +1,5 @@
 # Grafana - https://grafana.com/
+# Prometheus - https://prometheus.io/
 version: "3.9"
 
 services:
@@ -8,7 +9,7 @@ services:
     hostname: grafana
     restart: unless-stopped
     volumes:
-      - storage:/var/lib/grafana
+      - grafana-storage:/var/lib/grafana
     ports:
       - 3000:3000
     environment:
@@ -24,5 +25,60 @@ services:
       - "diun.include_tags=latest"
       - "com.centurylinklabs.watchtower.enable=false"
 
+  prometheus:
+    image: prom/prometheus :latest
+    container_name: prometheus
+    hostname: prometheus
+    restart: unless-stopped
+    volumes:
+      - prometheus-config:/etc/prometheus/
+      - prometheus-data:/prometheus
+    ports:
+      - 9090:9090
+    environment:
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Prometheus
+      - homepage.href=http://192.168.1.201:9090
+      - homepage.description=Prometheus Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - "com.centurylinklabs.watchtower.enable=false"
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command: '--path.rootfs=/host'
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - /:/host:ro,rslave
+
+  cadvisor:
+    image: d3vilh/cadvisor:latest
+    container_name: cadvisor
+    command:
+      - '-port=8098'
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - 8098:8098
+    devices:
+      - /dev/kmsg
+    privileged: true
+    restart: unless-stopped
+
+networks:
+  monitoring:
+    driver: bridge
+
+ volumes:
 volumes:
-  storage:
+  grafana-storage:
+  prometheus-config:
+  prometheus-data:

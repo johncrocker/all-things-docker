@@ -3,7 +3,7 @@ version: "3.9"
 
 services:
   metube:
-    image: ghcr.io/alexta69/metube
+    image: ghcr.io/alexta69/metube:latest
     container_name: metube
     restart: unless-stopped
     environment:
@@ -14,3 +14,12 @@ services:
       - "3014:8081"
     volumes:
       - /media/external/.ydl:/downloads
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Metube
+      - homepage.href=http://192.168.1.201:3014
+      - homepage.description=Metube Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - "com.centurylinklabs.watchtower.enable=true"

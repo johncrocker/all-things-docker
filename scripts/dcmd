@@ -389,7 +389,7 @@ function helptext() {
 	echoinfo "  tail - Shows the most recent 20 lines of a given container log"
 	echoinfo "  stats - Output Docker stats on all containers (specifiy only stats as parameter for global stats)"
 	echoinfo "  tidy - Tidies unused containers up"
-	echoinfov"  info - Inspects a container"
+	echoinfo "  info - Inspects a container"
 	echoinfo "  bulk - Performs bulk tasks against all containers"
 	echoinfo "  ps - Display global process information"
 	echoinfo "  ip - List all container IP addresses"

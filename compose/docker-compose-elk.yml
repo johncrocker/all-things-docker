@@ -4,7 +4,7 @@ version: "3.9"
 services:
   elasticsearch:
     image: elasticsearch:8.12.2
-    container_name: elasicsearch
+    container_name: elasticsearch
     hostname: elasticsearch
     restart: unless-stopped
     volumes:

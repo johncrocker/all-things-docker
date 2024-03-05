@@ -170,7 +170,7 @@ function dockerlogs() {
 		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
 		containername=$(getcontainername $firstcontainer)
 		echo "Showing logs for $containername"
-		docker logs $containername -details -t "${@:3}"
+		docker logs $containername --details -t "${@:3}"
 	else
 		echo "Showing logs for $containername"
 		docker logs $containername --details -t "${@:4}"
@@ -219,6 +219,29 @@ function updatecheck() {
 		fi
 
 		printf "%-20s %-10s %s\n" "$containername" "$status" "$imagename"
+	done
+
+}
+
+function updatecheckall() {
+	printf "%-20s %-20s %-10s %s\n" "STACK" "CONTAINER" "STATUS" "IMAGE"
+
+	for containerid in $(docker ps -q); do
+		imagename=$(getdockerimagename "$containerid")
+		status="no-change"
+		containername=$(getcontainername "$containerid")
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+		workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+		currenthash=$(docker image ls "$imagename" --quiet)
+		result=$(docker pull "$imagename")
+		newhash=$(docker image ls "$imagename" --quiet)
+
+		if [[ "$currenthash" != "$newhash" ]]; then
+			status="update-due"
+		fi
+
+		printf "%-20s %-20s %-10s %s\n" "$projectname" "$containername" "$status" "$imagename"
 	done
 
 }
@@ -383,6 +406,7 @@ function helptext() {
 	echoinfo "  recreate - Deletes all containers, networks, volumes, images in a stack and then recreates them"
 	echoinfo "  update - Updates and restarts containers from repo"
 	echoinfo "  updatecheck - Checks which containers need updating from repo"
+	echoinfo "  updatecheckall - Checks all containers for updates from repo"
 	echoinfo "  up - Starts a stack in detached mode"
 	echoinfo "  shell - Runs an interactive shell inside a container"
 	echoinfo "  logs - Shows the logs for a given container"
@@ -428,6 +452,10 @@ if [ "$1" != "" ]; then
 		;;
 	stats)
 		dockerstatsall "$2" | sort
+		exit 0
+		;;
+	updatecheckall)
+		updatecheckall "$2" | sort
 		exit 0
 		;;
 	ps)

@@ -11,8 +11,8 @@ services:
       - ytdl-mongo-db
     volumes:
       - "appdata:/app/appdata"
-      - "audio:/app/audio"
-      - "video:/app/video"
+      - "/media/downloads/audio:/app/audio"
+      - "/media/downloads/video:/app/video"
       - "subscriptions:/app/subscriptions"
       - "users:/app/users"
     ports:
@@ -46,6 +46,4 @@ volumes:
   config_data:
   users:
   subscriptions:
-  video:
-  audio:
   appdata:

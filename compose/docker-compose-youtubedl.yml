@@ -13,8 +13,8 @@ services:
       - "appdata:/app/appdata"
       - "/media/downloads/audio:/app/audio"
       - "/media/downloads/video:/app/video"
-      - "subscriptions:/app/subscriptions"
-      - "users:/app/users"
+      - "/media/downloads/subscriptions:/app/subscriptions"
+      - "/media/downloads/users:/app/users"
     ports:
       - "3014:17442"
     image: tzahi12345/youtubedl-material:latest
@@ -44,6 +44,4 @@ services:
 volumes:
   mongo_data:
   config_data:
-  users:
-  subscriptions:
   appdata:

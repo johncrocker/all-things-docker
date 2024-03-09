@@ -14,9 +14,10 @@ services:
       - SUDO_PASSWORD=password #optional
       - SUDO_PASSWORD_HASH= #optional
       - PROXY_DOMAIN=code-server.my.domain #optional
-      - DEFAULT_WORKSPACE=/config/workspace #optional
+      - DEFAULT_WORKSPACE=/src #optional
     volumes:
       - code_config:/config
+      - ${HOME}/src:/src
     ports:
       - "3006:8443"
     restart: unless-stopped

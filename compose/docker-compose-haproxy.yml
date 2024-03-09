@@ -1,33 +1,28 @@
-# Code Server - https://hub.docker.com/r/linuxserver/code-server
+# HAProxy - https://www.haproxy.org/ 
 version: "3.9"
 
 services:
-  code-server:
-    image: lscr.io/linuxserver/code-server:latest
-    container_name: code-server
+  haproxy:
+    image: haproxytech/haproxy-alpine:latest
+    container_name: haproxy
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
-      - PASSWORD=password #optional
-      - HASHED_PASSWORD= #optional
-      - SUDO_PASSWORD=password #optional
-      - SUDO_PASSWORD_HASH= #optional
-      - PROXY_DOMAIN=code-server.my.domain #optional
-      - DEFAULT_WORKSPACE=/config/workspace #optional
     volumes:
-      - code_config:/config
+      - haproxy_config:/usr/local/etc/haproxy
     ports:
-      - "3006:8443"
+      - "80:80"
+      - "443:443"
     restart: unless-stopped
     labels:
        - homepage.group=Containers
-       - homepage.name=Code Server
-       - homepage.href=http://openvscode.lan
-       - homepage.description=Code as a Web App
+       - homepage.name=HAProxy
+       - homepage.href=https://www.haproxy.org/
+       - homepage.description=The Reliable, High Performance TCP/HTTP Load Balancer
        - "diun.enable=true"
        - "diun.watch_repo=true"
        - "diun.include_tags=latest"
 
 volumes:
-  code_config:
+  haproxy_config:

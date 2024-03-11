@@ -12,7 +12,7 @@ services:
     volumes:
 #      - $PWD/Caddyfile:/etc/caddy/Caddyfile
       - caddy_sites:/etc/caddy
-      - $PWD/site:/srv
+#      - $PWD/site:/srv
       - caddy_data:/data
       - caddy_config:/config
     cap_add:

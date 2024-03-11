@@ -1,4 +1,4 @@
-# Caddy - https://www.caddysever.com / 
+# Caddy - https://caddyserver.com/
 version: "3.9"
 
 services:
@@ -25,7 +25,7 @@ services:
     labels:
       - homepage.group=Containers
       - homepage.name=Caddy
-      - homepage.href=https://www.caddyserver.com/
+      - homepage.href=https://caddyserver.com/
       - "diun.enable=true"
       - "diun.watch_repo=true"
       - "diun.include_tags=latest"

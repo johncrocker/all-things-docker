@@ -9,8 +9,15 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - PORT=80
+      - SERVER_NAME=lighttpd
+      - SERVER_ROOT=/var/www/html
+      - CONFIG_FILE=/etc/lighttpd/lighttpd.conf
+      - SKIP_HEALTHCHECK=false
+      - MAX_FDS=1024
     volumes:
-      - lighttpd_config:/usr/local/etc/lighttpd
+      - lighttpd_config:/etc/lighttpd
+      - lighttpd_root:/var/www/html
     ports:
       - "80:80"
     restart: unless-stopped
@@ -24,3 +31,4 @@ services:
 
 volumes:
   lighttpd_config:
+  lighttpd_root:

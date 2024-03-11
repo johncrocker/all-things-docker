@@ -10,9 +10,16 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - caddy_config:/usr/local/etc/caddy
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - $PWD/site:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    cap_add:
+      - NET_ADMIN
     ports:
       - "80:80"
+      - "443:443"
+      - "443:443/udp"
     restart: unless-stopped
     labels:
       - homepage.group=Containers
@@ -24,3 +31,4 @@ services:
 
 volumes:
   caddy_config:
+  caddy_data:

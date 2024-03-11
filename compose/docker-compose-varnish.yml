@@ -1,0 +1,27 @@
+# Varnish - https://www.varnish~cache.org/ 
+version: "3.9"
+
+services:
+  varnish:
+    image: varnish:stable
+    container_name: varnish
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - varnish_config:/usr/local/etc/varnish
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Varnish
+      - homepage.href=https://www.varnish-cache.org/
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  varnish_config:
+ 

@@ -1,0 +1,26 @@
+# Caddy - https://www.caddysever.com / 
+version: "3.9"
+
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - caddy_config:/usr/local/etc/caddy
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Caddy
+      - homepage.href=https://www.caddyserver.com/
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  caddy_config:

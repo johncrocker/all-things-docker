@@ -7,6 +7,7 @@ services:
     image: pihole/pihole:latest
     hostname: pihole
     volumes:
+      - /etc/resolv.conf:/etc/resolv.conf:ro
       - 'pihole:/etc/pihole/'
       - 'addon:/usr/local/share/bin/'
       - 'dnsmasq.d:/etc/dnsmasq.d/'

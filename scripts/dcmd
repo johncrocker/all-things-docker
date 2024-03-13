@@ -365,11 +365,22 @@ function genrunbook() {
 function echokeyfile() {
 	projectid="${1^^}_"
 	envfile="$2"
+	showcontent="$3"
+
+	if [ "$showcontent" = "" ]; then
+		showcontent="false"
+	fi
 
 	if [ -e "$envfile" ]; then
 		while IFS='=' read -r key value; do
 			dkey="$projectid"
-			echo "      - ${key#${projectid}}=\${$key}"
+
+		        if [ "$showcontent" = "true" ]; then
+echo "      - ${key#${projectid}}=$(eval "echo \$$key")"
+                        else
+                        	echo "      - ${key#${projectid}}=\${$key}"
+                        fi
+
 		done <"$envfile"
 	fi
 }
@@ -379,6 +390,13 @@ function genkeys() {
 	echokeyfile "$3" "$4/global.env"
 	echokeyfile "$3" "$4/$6.env"
 	echokeyfile "$3" "$5/$6.env"
+}
+
+function genkeyvalues() {
+	echo "    environment:"
+	echokeyfile "$3" "$4/global.env" "true"
+	echokeyfile "$3" "$4/$6.env" "true"
+	echokeyfile "$3" "$5/$6.env" "true"
 }
 
 function banner() {
@@ -561,6 +579,9 @@ if [ -e "$composefile" ]; then
 		;;
 	runbook)
 		genrunbook $stackname $composefilename $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	keyvalues)
+		genkeyvalues $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
 		;;
 	keys)
 		genkeys $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix

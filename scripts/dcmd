@@ -401,9 +401,9 @@ function genkeyvalues() {
 }
 
 function genstack() {
-while IFS="" read -r line; do
-echo "$line"
-done <<< "$2"
+cat "$2" | while read line; do
+echo "$line!"
+done
 }
 
 function banner() {

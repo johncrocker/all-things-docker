@@ -353,6 +353,7 @@ function genrunbook() {
 
 	echo "export DOCKER_GATEWAY_HOST=\$è\(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print \$3}'\)"
 	echo "export DOCKER_COMPOSE_FOLDER=\"$DOCKER_COMPOSE_FOLDER\""
+	echo "export DOCKER_LOG_FOLDER=\"$DOCKER_LOG_FOLDER\""
 	echo "export PUID=\"\$UID\""
 	echo "export PGID=\$\(getent group docker | cut -d: -f3\)"
 
@@ -439,6 +440,11 @@ function helptext() {
 	echoinfo "  ip - List all container IP addresses"
 	echoinfo ""
 }
+
+if [ "$DOCKER_LOG_FOLDER" = "" ]; then
+	export DOCKER_LOG_FOLDER="$HOME/logs"
+fi
+
 
 if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
 	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."

@@ -377,7 +377,7 @@ function echokeyfile() {
 			dkey="$projectid"
 
 		        if [ "$showcontent" = "true" ]; then
-echo "      - ${key#${projectid}}=$(eval "echo \$$key")"
+				echo "      - ${key#${projectid}}=$(eval "echo \$$key")"
                         else
                         	echo "      - ${key#${projectid}}=\${$key}"
                         fi
@@ -398,6 +398,12 @@ function genkeyvalues() {
 	echokeyfile "$3" "$4/global.env" "true"
 	echokeyfile "$3" "$4/$6.env" "true"
 	echokeyfile "$3" "$5/$6.env" "true"
+}
+
+function genstack() {
+while IFS="" read -r line; do
+echo "$line"
+done <<< "$2"
 }
 
 function banner() {
@@ -422,8 +428,9 @@ function helptext() {
 	echoinfo "  rm - Removes all containers in a stack"
 	echoinfo "  murder - Deletes all containers, networks, volumes, images in a stack"
 	echoinfo "  runbook - Creates a Bash script to provision a stack"
-	echoinfo "  keys - Lists defined environment in a stack"
+	echoinfo "  keys - Lists defined environment in a stack use keyvalues for values."
 	echoinfo "  create - Creates but does not run a stack"
+        echoinfo "  stack - Prints a fully populated stack file"
 	echoinfo "  recreate - Deletes all containers, networks, volumes, images in a stack and then recreates them"
 	echoinfo "  update - Updates and restarts containers from repo"
 	echoinfo "  updatecheck - Checks which containers need updating from repo"
@@ -588,6 +595,9 @@ if [ -e "$composefile" ]; then
 		;;
 	keyvalues)
 		genkeyvalues $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	stack)
+		genstack $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
 		;;
 	keys)
 		genkeys $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix

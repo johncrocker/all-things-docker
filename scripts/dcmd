@@ -401,9 +401,8 @@ function genkeyvalues() {
 }
 
 function genstack() {
-cat "$2" | while read line; do
-echo "$line!"
-done
+
+envsubst < "$2"
 }
 
 function banner() {

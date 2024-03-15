@@ -18,10 +18,17 @@ services:
     ports:
       - 3000:3000
       - 3001:3001
-    devices:
-      - /dev/dri:/dev/dri #optional
     shm_size: "1gb" #optional
     restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - homepage.group=Containers
+      - homepage.name=Linux Webtop
+      - homepage.href=http://192.168.1.201:3000
+      - homepage.description=Linux Mate Desktop
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=alpine-mate"
 
 volumes:
   config:

@@ -23,6 +23,10 @@ services:
       - "diun.enable=true"
       - "diun.watch_repo=true"
       - "diun.include_tags=latest"
+      - homepage.group=Containers
+      - homepage.name=Your Spotify
+      - homepage.href=http://yourspotify.lan
+      - homepage.description=Your Spotify Service
 
   mongo:
     container_name: mongo

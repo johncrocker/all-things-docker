@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    hostname: plexx
+    network_mode: host
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - VERSION=docker
+      - PLEX_CLAIM= #optional
+    volumes:
+      - library:/config
+      - tvseries:/tv
+      - movies:/movies
+    restart: unless-stopped
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  tvseries:
+  movies:
+  library:

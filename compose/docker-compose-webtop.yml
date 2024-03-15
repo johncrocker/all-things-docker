@@ -1,9 +1,8 @@
-# Linuxserver Webtop - https://docs.linuxserver.io/images/docker-webtop/
 version: "3.9"
 
 services:
   webtop:
-    image: lscr.io/linuxserver/webtop:latest
+    image: lscr.io/linuxserver/webtop:alpine-mate
     container_name: webtop
     security_opt:
       - seccomp:unconfined #optional
@@ -14,8 +13,8 @@ services:
       - SUBFOLDER=/ #optional
       - TITLE=Webtop #optional
     volumes:
-      - /path/to/data:/config
-      - /var/run/docker.sock:/var/run/docker.sock #optional
+      - config:/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro #optional
     ports:
       - 3000:3000
       - 3001:3001
@@ -23,3 +22,6 @@ services:
       - /dev/dri:/dev/dri #optional
     shm_size: "1gb" #optional
     restart: unless-stopped
+
+volumes:
+  config:

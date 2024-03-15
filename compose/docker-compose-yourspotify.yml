@@ -9,7 +9,8 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - APP_URL=http://192.168.1.201:3080
+      - APP_URL=http://yourspotify.lan/
+      - CALLBACK_URL=http://yourspotify.lan/api/oauth/spotify/callback
       - SPOTIFY_PUBLIC=
       - SPOTIFY_SECRET=
       - CORS=all
@@ -25,7 +26,9 @@ services:
 
   mongo:
     container_name: mongo
-    image: mongo:6
+    image: mongo:4.1.13
+    logging:
+      driver: "none"
     volumes:
       - mongo_db:/data/db
 

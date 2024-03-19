@@ -8,7 +8,7 @@ services:
     command: -H unix:///var/run/docker.sock
     hostname: portainer
     ports:
-      - "3009:8000/tcp"
+      - "8000:8000/tcp"
       - "9443:9443/tcp"
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'

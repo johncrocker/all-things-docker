@@ -1,0 +1,45 @@
+version: '3.9'
+
+services:
+  traefik:
+    image: "traefik:latest"
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - "no-new-privileges:true"
+    networks:
+      - proxy
+    extra_hosts:
+      - host.docker.internal:172.17.0.1
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${HOME}/traefik-data/traefik.yml:/traefik.yml:ro"
+      - "${HOME}/traefik-data/acme.json:/acme.json"
+      - "${HOME}/traefik-data/configurations:/configurations"
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - "traefik.backend=traefik"
+      - traefik.http.routers.traefik.rule=Host(`traefik.apps.home.arpa`)
+      - "traefik.http.services.traefik.loadbalancer.server.port=80"
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.middlewares=user-auth@file
+      - homepage.group=Containers
+      - homepage.name=Traefik
+      - homepage.href=http://192.168.1.201:8080
+      - homepage.description=Traefik Reverse Proxy Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+
+networks:
+  proxy:
+    external: true

@@ -6,13 +6,11 @@ services:
     image: caddy:latest
     container_name: caddy
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/London
     volumes:
-#      - $PWD/Caddyfile:/etc/caddy/Caddyfile
       - caddy_sites:/etc/caddy
-#      - $PWD/site:/srv
       - caddy_data:/data
       - caddy_config:/config
     cap_add:
@@ -23,14 +21,22 @@ services:
       - "443:443/udp"
     restart: unless-stopped
     labels:
+      - autoheal=true 
       - homepage.group=Containers
       - homepage.name=Caddy
       - homepage.href=https://caddyserver.com/
+      - homepage.description=Caddy Web Server
       - "diun.enable=true"
       - "diun.watch_repo=true"
       - "diun.include_tags=latest"
+    networks:
+      - proxy-network
 
 volumes:
   caddy_config:
   caddy_data:
   caddy_sites:
+
+networks:
+  proxy-network:
+    external: true

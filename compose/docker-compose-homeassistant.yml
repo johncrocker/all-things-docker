@@ -1,0 +1,28 @@
+# HomeAssistant - https://www.home-assistant.io
+version: "3.9"
+
+services:
+  homeassistant:
+    environment:
+      - TZ=${TZ}
+      - DISABLE_JEMALLOC=${HOMEASSISTANT_DISABLE_JEMALLOC}
+    container_name: homeassistant
+    image: homeassistant/home-assistant:latest
+    hostname: homeassistant
+    privileged: true
+    network_mode: "host"
+    volumes:
+      - 'config:/config'
+      - '/run/dbus:/run/dbus:ro'
+      - '/etc/localtime:/etc/localtime:ro'
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - homepage.group=Containers
+      - homepage.name=Homeassistant
+      - homepage.href=http://homeassistant.lan
+      - homepage.description=Homeassistant Manager Service
+      - "diun.enable=true"
+
+volumes:
+  config:

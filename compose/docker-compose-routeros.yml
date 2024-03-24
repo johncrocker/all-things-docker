@@ -1,0 +1,25 @@
+# Mikrotik RouterOS - https://hub.docker.com/r/mkv28/mikrotik-routeros
+#                     https://github.com/EvilFreelancer/docker-routeros
+#                     https://help.mikrotik.com/docs/display/ROS/RouterOS
+version: "3.9"
+
+services:
+  routeros:
+    container_name: "mikrotik"
+    image: mkv28/mikrotik-routeros:latest
+    restart: unless-stopped
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    ports:
+      - "2222:22"
+      - "2223:23"
+      - "7777:80"
+      - "8728:8728"
+      - "8729:8729"
+      - "28728:8728"
+      - "28729:8729"
+      - "8291:8291"
+      - "5900:5900"

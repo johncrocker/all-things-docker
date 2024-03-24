@@ -1,0 +1,31 @@
+# Homepage - https://gethomepage.dev/latest/
+version: "3.9"
+services:
+  homepage:
+    environment:
+      - TZ=${TZ}
+      - PUID=${HOMEPAGE_PUID}
+      - PGID=${HOMEPAGE_PGID}
+      - CONTAINERS=${HOMEPAGE_CONTAINERS}
+      - SERVICES=${HOMEPAGE_SERVICES}
+      - TASKS=${HOMEPAGE_TASKS}
+      - POST=${HOMEPAGE_POST}
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - 3005:3000
+    volumes:
+      - homepage_data:/app/config/
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Homepage
+      - homepage.href=http://homepage.lan/
+      - homepage.description=Homepage Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  homepage_data:

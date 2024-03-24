@@ -1,0 +1,19 @@
+# Watchtower - https://containrrr.dev/watchtower/
+version: "3.9"
+
+services:
+  watchtower:
+    env_file:
+      - ${DOCKER_ENV}/watchtower.env
+    image: containrrr/watchtower:latest
+    restart: unless-stopped
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Watchtower
+      - homepage.description=Watchtower Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"

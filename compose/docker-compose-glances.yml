@@ -1,0 +1,26 @@
+# Glances - https://nicolargo.github.io/glances/
+version: "3.9"
+
+services:
+  glances:
+    image: nicolargo/glances:latest
+    container_name: glances
+    environment:
+      - TZ=${TZ}
+    restart: unless-stopped
+    ports:
+      - "61208:61208"
+      - "61209:61209"
+    environment:
+      TZ: 'Europe/London'
+      GLANCES_OPT: "-w"
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    labels:
+      - homepage.group=Containers
+      - homepage.href=http://192.168.1.201:61208
+      - homepage.name=Glances
+      - homepage.description=Glances System Monitor Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"

@@ -1,0 +1,21 @@
+# Control-D DNS Resolver - https://github.com/Control-D-Inc/ctrld
+version: "3.9"
+
+services:
+  controld-dns:
+    environment:
+      - TZ=Europe/London
+    command: "--cd "
+    restart: unless-stopped
+    container_name: controld-dns
+    image: controldns/ctrld:latest
+    ports:
+      - "5300:53/udp"
+      - "5300:53/tcp"
+    cap_add:
+      - NET_ADMIN
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"

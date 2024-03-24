@@ -1,0 +1,639 @@
+#!/bin/bash
+
+if ! command -v skopeo &>/dev/null; then
+	echo "Installing skopeo dependency"
+	sudo apt install skopeo -y
+fi
+
+if ! command -v column &>/dev/null; then
+	echo "Installing column dependency"
+	sudo apt install bsdutils -y
+fi
+
+if ! command -v jq &>/dev/null; then
+	echo "Installing jq dependency"
+	sudo apt install jq -y
+fi
+
+function listallstackips {
+
+	printf "%-20s %-20s %s\n" "STACK" "ADDRESS" "CONTAINER"
+
+	for containerid in $(docker ps -q); do
+		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid) imagename=$(getdockerimagename "$containerid")
+		containername=$(getcontainername "$containerid")
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+		workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+
+		if [ "$ipaddress" = "" ]; then
+			ipaddress="0.0.0.0"
+		fi
+
+		printf "%-20s %-20s %s\n" $projectname $ipaddress $containername
+	done
+}
+
+function bulkexecute() {
+	echo "#!/bin/bash"
+
+	for containerid in $(docker ps -a -q); do
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		echo "dcmd ${projectname/-stack/} $1"
+	done | sort | uniq
+	echo ""
+}
+
+function dockerinspect() {
+	containername="$3"
+	template="$4"
+
+	if [ "$containername" = "" ]; then
+		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
+		containername=$(getcontainername $firstcontainer)
+	fi
+
+	if [ "$template" = "" ]; then
+		docker inspect --type=container --size -f "json" "$containername" | jq
+	else
+		docker inspect --type=container --size -f "{{json $template}}" "$containername" | jq
+	fi
+
+}
+
+function cleardocker() {
+	#docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
+	docker image prune -a --filter "until=24h" -f
+}
+
+function dockerpsall() {
+
+	template="$1"
+	if [ "$1" = "" ]; then
+		template="table {{.Names}}\t{{.Status}}"
+	fi
+
+	pscmd=$(docker ps -s --no-trunc --all --format "$template")
+	index=1
+
+	while IFS="" read -r line; do
+		if [ "$index" = "1" ]; then
+			printf "%s\t\t%s\n" "STACK CONFIG FILE" "$line"
+		else
+			containerid="$(echo $line | cut -d$' ' -f1)"
+			projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+			configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+			workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+			configfile="${configfile/$DOCKER_COMPOSE_FOLDER\//}"
+			printf "%s\t\t%s\n" "$configfile" "$line"
+		fi
+
+		index=$((index + 1))
+	done <<<"$pscmd"
+
+	unset ILS
+
+}
+
+function dockerstatsall() {
+
+	template="$1"
+	if [ "$1" = "" ]; then
+		template="table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}\t{{.MemPerc}}\t{{.PIDs}}"
+	fi
+
+	statscmd=$(docker container stats --all --no-trunc --no-stream --format "$template")
+	index=1
+
+	while IFS="" read -r line; do
+
+		if [ "$index" = "1" ]; then
+			printf $"%s\t\t%s\n" "STACK" "$line"
+		else
+			containerid="$(echo $line | cut -d$' ' -f1)"
+			projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+			printf "%s\t%s\n" "$projectname" "$line"
+		fi
+
+		index=$((index + 1))
+	done <<<"$statscmd"
+
+	unset ILS
+}
+
+function echoerr() {
+	printf "%s\n" "$*" >&2
+
+}
+
+function echoinfo() {
+	printf "%s\n" "$*" >&2
+}
+
+function loadenvfile() {
+	envfile="$1"
+	if [ -e "$envfile" ]; then
+		echoinfo "Reading Environment file: $envfile"
+		set -a
+		source "$envfile"
+	fi
+}
+
+function dockercompose() {
+	docker-compose -p $1 -f $2 $3 "${@:4}"
+}
+
+function getdockerlabel() {
+	labelname="$1"
+	container="$2"
+	template="{{ index .Config.Labels \"$labelname\"}}"
+	labelvalue=$(docker inspect -f "$template" "$container")
+	echo "$labelvalue"
+}
+
+function dockerstat() {
+	projectname=""
+	containername=""
+	containerids=""
+
+	for containerid in $(dockercompose $1 $2 ps -q); do
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		ontainername=$(getcontainername $containerid)
+		containerids="$containerids $containerid"
+	done
+
+	echo "Stack name: $projectname"
+	echo ""
+	docker container stats $containerids --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.BlockIO}}\t{{.NetIO}}\t{{.MemPerc}}"
+}
+
+function dockerexec() {
+	if [ "$containername" = "" ]; then
+		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
+		containername=$(getcontainername $firstcontainer)
+		echo "Running inside $containername"
+		docker exec -it $containername $3 "${@:4}"
+	else
+		echo "Running inside $containername"
+		docker exec -it $containername $3 "${@:5}"
+	fi
+}
+
+function dockerlogs() {
+	containername="$3"
+	if [ "$containername" = "" ]; then
+		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
+		containername=$(getcontainername $firstcontainer)
+		echo "Showing logs for $containername"
+		docker logs $containername --details -t "${@:3}"
+	else
+		echo "Showing logs for $containername"
+		docker logs $containername --details -t "${@:4}"
+	fi
+}
+
+function dockerlogstail() {
+	containername="$3"
+	if [ "$containername" = "" ]; then
+		firstcontainer=$(dockercompose $1 $2 "ps" -q | head -n 1)
+		containername=$(getcontainername $firstcontainer)
+		echo "Showing most recent 20 lines of logs for $containername"
+		docker logs $containername --details -t -n 20 "${@:3}"
+	else
+		echo "Showing most recent 20 lines of log for $containername"
+		docker logs $containername --details -t -n 20 "${@:4}"
+	fi
+}
+
+function getdockerimagename() {
+	container="$1"
+	imagename=$(docker inspect -f "{{ index .Config.Image }}" $container)
+	echo "$imagename"
+}
+
+function getcontainername() {
+	containername=$(docker inspect -f "{{.Name}}" $1)
+	containername="${containername/\//}"
+	echo "$containername"
+}
+
+function updatecheck() {
+	printf "%-20s %-10s %s\n" "CONTAINER" "STATUS" "IMAGE"
+
+	for containerid in $(dockercompose $1 $2 ps -q); do
+		imagename=$(getdockerimagename "$containerid")
+		containername=$(getcontainername "$containerid")
+		status="no-change"
+		imagename=$(getdockerimagename "$containerid")
+		currenthash=$(docker image ls "$imagename" --quiet)
+		result=$(docker pull "$imagename")
+		newhash=$(docker image ls "$imagename" --quiet)
+
+		if [[ "$currenthash" != "$newhash" ]]; then
+			status="update-due"
+		fi
+
+		printf "%-20s %-10s %s\n" "$containername" "$status" "$imagename"
+	done
+
+}
+
+function updatecheckall() {
+	printf "%-20s %-20s %-10s %s\n" "STACK" "CONTAINER" "STATUS" "IMAGE"
+
+	for containerid in $(docker ps -q); do
+		imagename=$(getdockerimagename "$containerid")
+		status="no-change"
+		containername=$(getcontainername "$containerid")
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+		workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+		currenthash=$(docker image ls "$imagename" --quiet)
+		result=$(docker pull "$imagename")
+		newhash=$(docker image ls "$imagename" --quiet)
+
+		if [[ "$currenthash" != "$newhash" ]]; then
+			status="update-due"
+		fi
+
+		printf "%-20s %-20s %-10s %s\n" "$projectname" "$containername" "$status" "$imagename"
+	done
+
+}
+
+function listcontainerips {
+
+	printf "%-20s %-20s %s\n" "STACK" "ADDRESS" "CONTAINER"
+
+	for containerid in $(dockercompose $1 $2 ps -q); do
+		ipaddress=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $containerid)
+		imagename=$(getdockerimagename "$containerid")
+		containername=$(getcontainername "$containerid")
+		projectname=$(getdockerlabel "com.docker.compose.project" $containerid)
+		configfile=$(getdockerlabel "com.docker.compose.project.config_files" $containerid)
+		workingdir=$(getdockerlabel "com.docker.compose.project.working_dir" $containerid)
+
+		if [ "$ipaddress" = "" ]; then
+			ipaddress="0.0.0.0"
+		fi
+
+		printf "%-20s %-20s %s\n" $projectname $ipaddress $containername
+	done
+}
+
+function restartcontainers {
+	dockercompose $1 $2 stop
+	dockercompose $1 $2 up -d
+}
+
+function rebuildcontainers() {
+	dockercompose $1 $2 stop
+	dockercompose $1 $2 pull
+	dockercompose $1 $2 up --force-recreate --build -d
+	docker image prune -f
+}
+
+function debugcontainers {
+	dockercompose $1 $2 up
+}
+
+function removecontainers {
+	dockercompose $1 $2 stop
+	dockercompose $1 $2 rm
+}
+
+function murdercontainers() {
+
+	echo "CAUTION: This deletes everything related to this stack"
+	echo "Volumes, Containers, Images, Networks etc"
+	echo "Are you sure?"
+
+	select yn in "Yes" "No"; do
+		case $yn in
+		Yes)
+			dockercompose $1 $2 down -v --rmi all
+			echo "Deleted"
+			exit 0
+			;;
+		No)
+			echo "Aborting"
+			exit 0
+			;;
+		esac
+	done
+
+}
+
+function echoenvfile() {
+	envfile="$1"
+	if [ -e "$envfile" ]; then
+		while read p; do
+			printf 'export %s\n' "$p"
+		done <"$envfile"
+	fi
+}
+
+function updatecontainers() {
+	updatechanged="no"
+
+	for containerid in $(dockercompose $1 $2 ps -q); do
+		imagename=$(getdockerimagename "$containerid")
+		containername=$(getcontainername "$containerid")
+		currenthash=$(docker image ls "$imagename" --quiet)
+		result=$(docker pull "$imagename")
+		newhash=$(docker image ls "$imagename" --quiet)
+
+		if [[ "$currenthash" != "$newhash" ]]; then
+			echoinfo "Changed:   $containername $imagename"
+			updatechanged="yes"
+		else
+			echoinfo "No Change: $containername $imagename"
+		fi
+
+	done
+
+	if [[ "$updatechanged" = "yes" ]]; then
+		echoinfo "Something changed, restarting stack"
+		restartcontainers "$1" "$2"
+		echoinfo "Restarted stack"
+	else
+		echoinfo "No changes, no restart needed."
+	fi
+
+	echoinfo "Finished"
+}
+
+function genrunbook() {
+	echo "#!/bin/bash"
+
+	echo "export DOCKER_GATEWAY_HOST=\$è\(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print \$3}'\)"
+	echo "export DOCKER_COMPOSE_FOLDER=\"$DOCKER_COMPOSE_FOLDER\""
+	echo "export DOCKER_LOG_FOLDER=\"$DOCKER_LOG_FOLDER\""
+	echo "export PUID=\"\$UID\""
+	echo "export PGID=\$\(getent group docker | cut -d: -f3\)"
+
+	echoenvfile "$4/global.env"
+	echoenvfile "$4/$6.env"
+	echoenvfile "$5/$6.env"
+	echo "docker-compose -p $1 -f \$DOCKER_COMPOSE_FOLDER/$2 up -d"
+}
+
+function echokeyfile() {
+	projectid="${1^^}_"
+	envfile="$2"
+	showcontent="$3"
+
+	if [ "$showcontent" = "" ]; then
+		showcontent="false"
+	fi
+
+	if [ -e "$envfile" ]; then
+		while IFS='=' read -r key value; do
+			dkey="$projectid"
+
+			if [ "$showcontent" = "true" ]; then
+				echo "      - ${key#${projectid}}=$(eval "echo \$$key")"
+			else
+				echo "      - ${key#${projectid}}=\${$key}"
+			fi
+
+		done <"$envfile"
+	fi
+}
+
+function genkeys() {
+	echo "    environment:"
+	echokeyfile "$3" "$4/global.env"
+	echokeyfile "$3" "$4/$6.env"
+	echokeyfile "$3" "$5/$6.env"
+}
+
+function genkeyvalues() {
+	echo "    environment:"
+	echokeyfile "$3" "$4/global.env" "true"
+	echokeyfile "$3" "$4/$6.env" "true"
+	echokeyfile "$3" "$5/$6.env" "true"
+}
+
+function genstack() {
+
+	envsubst <"$2"
+}
+
+function banner() {
+	echoinfo ""
+	echoinfo "DDDDD    CCCCC  MM    MM DDDDD   "
+	echoinfo "DD  DD  CC    C MMM  MMM DD  DD  "
+	echoinfo "DD   DD CC      MM MM MM DD   DD "
+	echoinfo "DD   DD CC    C MM    MM DD   DD "
+	echoinfo "DDDDDD   CCCCC  MM    MM DDDDDD  "
+	echoinfo "-------------------------------- "
+	echoinfo "Your friendly Docker command helper!"
+	echoinfo ""
+}
+
+function helptext() {
+	echoinfo "Format: dcmd [projectnane] [command] [arguments]"
+	echoinfo "Where [command] is one of :"
+	echoinfo "  ip - Lists IP Addresses of containers in a stack"
+	echoinfo "  restart - Restarts all containers in a stack"
+	echoinfo "  rebuild - Deletes and recreates a stack but keeps persisted volumes"
+	echoinfo "  debug - Starts a stack in attached (debug) mode"
+	echoinfo "  rm - Removes all containers in a stack"
+	echoinfo "  murder - Deletes all containers, networks, volumes, images in a stack"
+	echoinfo "  runbook - Creates a Bash script to provision a stack"
+	echoinfo "  keys - Lists defined environment in a stack use keyvalues for values."
+	echoinfo "  create - Creates but does not run a stack"
+	echoinfo "  stack - Prints a fully populated stack file"
+	echoinfo "  recreate - Deletes all containers, networks, volumes, images in a stack and then recreates them"
+	echoinfo "  update - Updates and restarts containers from repo"
+	echoinfo "  updatecheck - Checks which containers need updating from repo"
+	echoinfo "  updatecheckall - Checks all containers for updates from repo"
+	echoinfo "  up - Starts a stack in detached mode"
+	echoinfo "  shell - Runs an interactive shell inside a container"
+	echoinfo "  logs - Shows the logs for a given container"
+	echoinfo "  tail - Shows the most recent 20 lines of a given container log"
+	echoinfo "  stats - Output Docker stats on all containers (specifiy only stats as parameter for global stats)"
+	echoinfo "  tidy - Tidies unused containers up"
+	echoinfo "  info - Inspects a container"
+	echoinfo "  bulk - Performs bulk tasks against all containers"
+	echoinfo "  ps - Display global process information"
+	echoinfo "  ip - List all container IP addresses"
+	echoinfo ""
+}
+
+if [ "$DOCKER_LOG_FOLDER" = "" ]; then
+	export DOCKER_LOG_FOLDER="$HOME/logs"
+fi
+
+if [ "$DOCKER_COMPOSE_FOLDER" = "" ]; then
+	echoerr "CRITICAL: Environment varable DOCKER_COMPOSE_FOLDER must be set to the folder contaihing the Docker Compose files."
+	exit 1
+fi
+
+if [ "$DOCKER_ENV" = "" ]; then
+	echoerr "CRITICAL: Environment varable DOCKER_ENV must be set to the folder containing the environnent files  used. Please resolve."
+	exit 1
+fi
+
+if [ "$DOCKER_SECRET_ENV" = "" ]; then
+	echoerr "CRITICAL: Environment variable DOCKER_SECRET_ENV must be set to the folder containing the secret files used. Please resolve."
+	exit 1
+fi
+
+export DOCKER_GATEWAY_HOST=$(ip addr show dev eth0 | grep 'state UP' -A2 | tail -n1 | awk -F'[/ ]+' '{print $3}')
+export PUID="$UID"
+export PGID=$(getent group docker | cut -d: -f3)
+export PGID=$(getent group "$USER" | cut -d: -f3)
+
+if [ "$1" != "" ]; then
+	case $1 in
+	bulk)
+		bulkexecute "$2"
+		exit 0
+		;;
+	tidy)
+		cleardocker
+		exit 0
+		;;
+	stats)
+		dockerstatsall "$2" | sort
+		exit 0
+		;;
+	updatecheckall)
+		updatecheckall "$2" | sort
+		exit 0
+		;;
+	ps)
+		dockerpsall "$2" | sort
+		exit 0
+		;;
+	ip)
+		listallstackips "$2" | sort
+		exit 0
+		;;
+	esac
+fi
+
+if [ $# -lt 2 ]; then
+	banner
+	helptext
+	exit 1
+fi
+
+project="$1"
+composefilename="docker-compose-$project.yml"
+composefile="$DOCKER_COMPOSE_FOLDER/$composefilename"
+stackname="$project-stack"
+cmd="$2"
+params=""
+envprefix="$1"
+sortcolumn="1"
+
+if [ $# -gt 2 ]; then
+	for i in "$@"; do
+		case $i in
+		-f=* | --file=*)
+			envprefix="${i#*=}"
+			composefilename="docker-compose-$envprefix.yml"
+			composefile="$DOCKER_COMPOSE_FOLDER/$composefilename"
+			shift
+			;;
+		-s=* | --sort=*)
+			sortcolumn="${i#*=}"
+			shift
+			;;
+		-* | --*)
+			echoerr "Unknown argument: $i"
+			exit 1
+			;;
+		*) ;;
+		esac
+	done
+fi
+
+if [ "$cmd" = "up" ]; then
+	params="-d"
+fi
+
+echoinfo "Stack·name:·$stackname"
+
+if [ -e "$composefile" ]; then
+	echoinfo "Using compose file: $composefile"
+
+	loadenvfile "$DOCKER_ENV/global.env"
+	loadenvfile "$DOCKER_ENV/$envprefix.env"
+	loadenvfile "$DOCKER_SECRET_ENV/$envprefix.env"
+	echoinfo ""
+
+	case $cmd in
+	ip)
+		listcontainerips $stackname $composefile | sort
+		;;
+	updatecheck)
+		updatecheck $stackname $composefile
+		;;
+	restart)
+		restartcontainers $stackname $composefile
+		;;
+	rebuild)
+		rebuildcontainers $stackname $composefile
+		;;
+	debug)
+		debugcontainers $stackname $composefile
+		;;
+	shell)
+		dockerexec $stackname $composefile "/bin/sh" $3 "${@:4}"
+		;;
+	logs)
+		dockerlogs $stackname $composefile $3 "${@:4}"
+		;;
+	tail)
+		dockerlogstail $stackname $composefile $3 "${@:4}"
+		;;
+	info)
+		dockerinspect $stackname $composefile $3 "${@:4}"
+		;;
+	stats)
+		dockerstat $stackname $composefile $sortcolumn | sort
+		;;
+	rm)
+		removecontainers $stackname $composefile
+		;;
+	murder)
+		murdercontainers $stackname $composefile
+		;;
+	runbook)
+		genrunbook $stackname $composefilename $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	keyvalues)
+		genkeyvalues $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	stack)
+		genstack $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	keys)
+		genkeys $stackname $composefile $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	create)
+		dockercompose $stackname $composefile up --no-start
+		;;
+	recreate)
+		dockercompose $stackname $composefile down -v --rmi all
+		dockercompose $stackname $composefile up --no-start
+		;;
+	update)
+		updatecontainers $stackname $composefilename $project $DOCKER_ENV $DOCKER_SECRET_ENV $envprefix
+		;;
+	*)
+		dockercompose $stackname $composefile $cmd $params
+		;;
+	esac
+
+else
+	echoerr Cannot find compose file: $composefile
+	echoerr Aborting
+	exit 1
+fi
+
+echoinfo ""

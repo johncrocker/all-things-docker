@@ -1,0 +1,25 @@
+# SMTP Relay - https://hub.docker.com/r/ixdotai/smtp
+version: "3.9"
+
+services:
+  smtprelay:
+    container_name: smtprelay
+    hostname: smtprelay
+    image: ixdotai/smtp:latest
+    restart: unless-stopped
+    ports:
+      - "25:25"
+      - "587:25"
+    environment:
+      - SMARTHOST_ADDRESS=${SMTP_SMARTHOST_ADDRESS}
+      - SMARTHOST_PORT=${SMTP_SMARTHOST_PORT}
+      - SMARTHOST_USER=${SMTP_SMARTHOST_USER}
+      - SMARTHOST_PASSWORD=${SMTP_SMARTHOST_PASSWORD}
+      - SMARTHOST_ALIASES=${SMTP_SMARTHOST_ALIASES}
+    labels:
+      - homepage.group=Containers
+      - homepage.name=SMTP
+      - homepage.description=SMTP Relay Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"

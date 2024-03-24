@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  webtop:
+    image: lscr.io/linuxserver/webtop:alpine-mate
+    container_name: webtop
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SUBFOLDER=/ #optional
+      - TITLE=Webtop #optional
+    volumes:
+      - /:/host:ro
+      - config:/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro #optional
+    ports:
+      - 3000:3000
+      - 3001:3001
+    shm_size: "1gb" #optional
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - homepage.group=Containers
+      - homepage.name=Linux Webtop
+      - homepage.href=http://192.168.1.201:3000
+      - homepage.description=Linux Mate Desktop
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=alpine-mate"
+
+volumes:
+  config:

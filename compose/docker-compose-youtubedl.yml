@@ -1,0 +1,47 @@
+# Youtube Downloader - https://github.com/Tzahi12345/YoutubeDL-Material
+version: "3.9"
+
+services:
+  ytdl-ui:
+    env_file:
+      - ${DOCKER_ENV}/youtubedl.env
+    restart: unless-stopped
+    container_name: ytdl-ui
+    depends_on:
+      - ytdl-mongo-db
+    volumes:
+      - "appdata:/app/appdata"
+      - "/media/downloads/audio:/app/audio"
+      - "/media/downloads/video:/app/video"
+      - "/media/downloads/subscriptions:/app/subscriptions"
+      - "/media/downloads/users:/app/users"
+    ports:
+      - "3014:17442"
+    image: tzahi12345/youtubedl-material:latest
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Youtube Downloader
+      - homepage.href=http://youtubedl.lan
+      - homepage.description=Youtube Downloader Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+  ytdl-mongo-db:
+    env_file:
+      - ${DOCKER_ENV}/youtubedl.env
+    image: mongo:4.1.13
+    logging:
+      driver: "none"
+    container_name: ytdl-mongo-db
+    restart: unless-stopped
+    volumes:
+      - "mongo_data:/data/db"
+      - "config_data:/data/configdb"
+    labels:
+      - "diun.enable=false"
+
+volumes:
+  mongo_data:
+  config_data:
+  appdata:

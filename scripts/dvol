@@ -1,0 +1,23 @@
+#!/bin/bash
+cmd="$1"
+spec="$2"
+
+if [ "$cmd" = "" ]; then
+	cmd="ls"
+fi
+
+if [ "$spec" = "" ]; then
+	spec="*"
+fi
+
+if [ "$spec" = "*" ]; then
+	volumes=$(docker volume ls -q)
+else
+	volumes=$(docker volume ls -q -f "name=$spec")
+fi
+
+case "$cmd" in
+ls) docker volume inspect $volumes ;;
+rm) docker volume rm $volumes ;;
+*) echo "Unknown command" ;;
+esac

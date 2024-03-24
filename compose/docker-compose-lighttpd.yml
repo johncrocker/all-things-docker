@@ -1,0 +1,34 @@
+# Lighttpd  - https://www.lighttpd.net/ 
+version: "3.9"
+
+services:
+  lighttpd:
+    image: jitesoft/lighttpd:latest
+    container_name: lighttpd
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - PORT=80
+      - SERVER_NAME=lighttpd
+      - SERVER_ROOT=/var/www/html
+      - CONFIG_FILE=/etc/lighttpd/lighttpd.conf
+      - SKIP_HEALTHCHECK=false
+      - MAX_FDS=1024
+    volumes:
+      - lighttpd_config:/etc/lighttpd
+      - lighttpd_root:/var/www/html
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Lighttpd
+      - homepage.href=https://www.lighttpd.net/
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  lighttpd_config:
+  lighttpd_root:

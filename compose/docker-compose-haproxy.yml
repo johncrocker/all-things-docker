@@ -1,0 +1,27 @@
+# HAProxy - https://www.haproxy.org/ 
+version: "3.9"
+
+services:
+  haproxy:
+    image: haproxytech/haproxy-alpine:latest
+    container_name: haproxy
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - haproxy_config:/usr/local/etc/haproxy
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=HAProxy
+      - homepage.href=https://www.haproxy.org/
+      - homepage.description=The Reliable, High Performance TCP/HTTP Load Balancer
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  haproxy_config:

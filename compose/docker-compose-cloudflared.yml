@@ -1,0 +1,20 @@
+# Cloudflared - https://github.com/visibilityspots/dockerfile-cloudflared
+version: "3.9"
+
+services:
+  cloudflared:
+    image: visibilityspots/cloudflared:latest
+    container_name: cloudflared
+    ports:
+      - "5054:5054/tcp"
+      - "5054:5054/udp"
+    environment:
+      - TZ="Europe/Lomdon"
+      - PORT=5054
+      - ADDRESS=0.0.0.0
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"

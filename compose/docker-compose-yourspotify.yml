@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  your_spotify:
+    image: lscr.io/linuxserver/your_spotify:latest
+    container_name: your_spotify
+    hostname: your_spotify
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - APP_URL=http://yourspotify.lan/
+      - CALLBACK_URL=http://yourspotify.lan/api/oauth/spotify/callback
+      - SPOTIFY_PUBLIC=
+      - SPOTIFY_SECRET=
+      - CORS=all
+      - MONGO_ENDPOINT=mongodb://mongo:27017/your_spotify
+    ports:
+      - 3080:80
+      - 3443:443
+    restart: unless-stopped
+    labels:
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+      - homepage.group=Containers
+      - homepage.name=Your Spotify
+      - homepage.href=http://yourspotify.lan
+      - homepage.description=Your Spotify Service
+
+  mongo:
+    container_name: mongo
+    image: mongo:4.1.13
+    logging:
+      driver: "none"
+    volumes:
+      - mongo_db:/data/db
+
+volumes:
+  mongo_db:

@@ -1,0 +1,21 @@
+# Dozzle - https://github.com/amir20/dozzle
+version: "3.9"
+
+services:
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    hostname: dozzle
+    ports:
+      - "3002:8080/tcp"
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Dozzle
+      - homepage.href=http://192.168.1.201:3002
+      - homepage.description=Dozzle Container log viewer
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"

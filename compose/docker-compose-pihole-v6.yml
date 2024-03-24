@@ -1,0 +1,51 @@
+# Pi-Hole - https://pi-hole.net
+version: "3.9"
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:development-v6
+    hostname: pihole
+    volumes:
+      - /etc/resolv.conf:/etc/resolv.conf:ro
+      - 'pihole:/etc/pihole/'
+      - 'dnsmasq.d:/etc/dnsmasq.d/'
+    cap_add:
+      - NET_ADMIN
+      - NET_BIND_SERVICE
+      - NET_RAW
+      - SYS_NICE
+      - CHOWN
+    environment:
+      - TZ=${TZ}
+#      - FTLCONF_dhcp_active=${PIHOLE_FTLCONF_dhcp_active}
+#      - FTLCONF_dhcp_end=${PIHOLE_FTLCONF_dhcp_end}
+#      - FTLCONF_dhcp_netmask=${PIHOLE_FTLCONF_dhcp_netmask}
+#      - FTLCONF_dhcp_ipv6=${PIHOLE_FTLCONF_dhcp_ipv6}
+#      - FTLCONF_dhcp_leaseTime=${PIHOLE_FTLCONF_dhcp_leaseTime}
+#      - FTLCONF_dhcp_rapidCommit=${PIHOLE_FTLCONF_dhcp_rapidCommit}
+#      - FTLCONF_dhcp_router=${PIHOLE_FTLCONF_dhcp_router}
+#      - FTLCONF_dhcp_start=${PIHOLE_FTLCONF_dhcp_start}
+#      - FTLCONF_dns_listeningMode=${PIHOLE_FTLCONF_dns_listeningMode}
+#      - FTLCONF_dns_upstreams=${PIHOLE_FTLCONF_dns_upstreams}
+#      - FTLCONF_dns_domain=${PIHOLE_FTLCONF_dns_domain}
+      - ServerIP=${PIHOLE_ServerIP}
+#      - FTLCONF_webserver_port=${PIHOLE_FTLCONF_webserver_port}
+      - VIRTUAL_HOST=${PIHOLE_VIRTUAL_HOST}
+      - FTLCONIPv6=${PIHOLE_FTLCONIPv6}
+      - FTLCONF_webserver_api_password=${PIHOLE_FTLCONF_webserver_api_password}
+    restart: unless-stopped
+    network_mode: "host"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - homepage.group=Containers
+      - homepage.name=PiHole
+      - homepage.href=http://pihole.lan/admin/
+      - homepage.description=PiHole Ad Blocker Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=development-v6"
+
+volumes:
+  pihole:
+  dnsmasq.d:

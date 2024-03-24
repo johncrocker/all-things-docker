@@ -1,0 +1,42 @@
+# Caddy - https://caddyserver.com/
+version: "3.9"
+
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=Europe/London
+    volumes:
+      - caddy_sites:/etc/caddy
+      - caddy_data:/data
+      - caddy_config:/config
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    restart: unless-stopped
+    labels:
+      - autoheal=true 
+      - homepage.group=Containers
+      - homepage.name=Caddy
+      - homepage.href=https://caddyserver.com/
+      - homepage.description=Caddy Web Server
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+    networks:
+      - proxy-network
+
+volumes:
+  caddy_config:
+  caddy_data:
+  caddy_sites:
+
+networks:
+  proxy-network:
+    external: true

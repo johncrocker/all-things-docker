@@ -1,0 +1,27 @@
+# Dashy - https://dashy.to
+version: "3.9"
+
+services:
+  dashy:
+    environment:
+      - TZ=${TZ}
+      - NODE_ENV=Production
+    container_name: dashy
+    image: lissy93/dashy:latest
+    hostname: nginxproxymanager
+    ports:
+      - "3022:80"
+    volumes:
+      - "data:/app/public/"
+    restart: unless-stopped
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Dashy
+      - homepage.href=http://192.168.1.201:3022
+      - homepage.description=The ultimate Home Page for your HomeLab
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  data:

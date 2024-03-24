@@ -1,0 +1,28 @@
+# Go2Rtc - https://github.com/AlexxIT/go2rtc
+version: "3.9"
+
+services:
+  go2rtc:
+    env_file:
+      - ${DOCKER_ENV}/go2rtc.env
+    image: alexxit/go2rtc:latest
+    container_name: go2rtc
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    environment:
+      - TZ=Europe/London
+    volumes:
+      - go2rtc_config:/config/
+    labels:
+      - homepage.group=Containers
+      - homepage.name=go2rtc
+      - homepage.href=http://192.168.1.201:1984/
+      - homepage.description=go2rtc Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  go2rtc_config:
+

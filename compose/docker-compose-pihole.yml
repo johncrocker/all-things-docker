@@ -1,0 +1,57 @@
+# Pi-Hole - https://pi-hole.net
+version: "3.9"
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    hostname: pihole
+    volumes:
+      - /etc/resolv.conf:/etc/resolv.conf:ro
+      - 'pihole:/etc/pihole/'
+      - 'addon:/usr/local/share/bin/'
+      - 'dnsmasq.d:/etc/dnsmasq.d/'
+    cap_add:
+      - NET_ADMIN
+      - NET_BIND_SERVICE
+      - NET_RAW
+      - SYS_NICE
+      - CHOWN
+    environment:
+      - TZ=${TZ}
+      - REV_SERVER=${PIHOLE_REV_SERVER}
+      - REV_SERVER_DOMAIN=${PIHOLE_REV_SERVER_DOMAIN}
+      - REV_SERVER_TARGET=${PIHOLE_REV_SERVER_TARGET}
+      - REV_SERVER_CIDR=${PIHOLE_REV_SERVER_CIDR}
+      - DHCP_ACTIVE=${PIHOLE_DHCP_ACTIVE}
+      - DHCP_END=${PIHOLE_DHCP_END}
+      - DHCP_IPv6=${PIHOLE_DHCP_IPv6}
+      - DHCP_LEASETIME=${PIHOLE_DHCP_LEASETIME}
+      - DHCP_rapid_commit=${PIHOLE_DHCP_rapid_commit}
+      - DHCP_ROUTER=${PIHOLE_DHCP_ROUTER}
+      - DHCP_START=${PIHOLE_DHCP_START}
+      - DNSMASQ_LISTENING=${PIHOLE_DNSMASQ_LISTENING}
+      - PIHOLE_DNS_=${PIHOLE_PIHOLE_DNS_}
+      - PIHOLE_DOMAIN=${PIHOLE_PIHOLE_DOMAIN}
+      - ServerIP=${PIHOLE_ServerIP}
+      - VIRTUAL_HOST=${PIHOLE_VIRTUAL_HOST}
+      - WEB_PORT=${PIHOLE_WEB_PORT}
+      - IPv6=${PIHOLE_IPv6}
+      - WEBPASSWORD=${PIHOLE_WEBPASSWORD}
+    restart: unless-stopped
+    network_mode: 'host'
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+      - homepage.group=Containers
+      - homepage.name=PiHole
+      - homepage.href=http://pihole.lan/admin/
+      - homepage.description=PiHole Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=latest"
+
+volumes:
+  pihole:
+  dnsmasq.d:
+  addon:
+

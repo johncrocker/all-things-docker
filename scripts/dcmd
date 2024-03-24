@@ -1,5 +1,20 @@
 #!/bin/bash
 
+if ! command -v skopeo &>/dev/null; then
+	echo "Installing skopeo dependency"
+	sudo apt install skopeo -y
+fi
+
+if ! command -v column &>/dev/null; then
+	echo "Installing column dependency"
+	sudo apt install bsdutils -y
+fi
+
+if ! command -v jq &>/dev/null; then
+	echo "Installing jq dependency"
+	sudo apt install jq -y
+fi
+
 function listallstackips {
 
 	printf "%-20s %-20s %s\n" "STACK" "ADDRESS" "CONTAINER"

@@ -1,0 +1,40 @@
+# Ghost - 
+version: "3.9"
+
+services:
+  ghost:
+    image: ghost:alpine
+    container_name: ghost
+    restart: unless-stopped
+    ports:
+      - '2368:2368/tcp'
+    volumes:
+      - "ghost:/var/lib/ghost/content"
+    environment:
+      VIRTUAL_HOST: ghost.apps.home.arpa
+      VIRTUAL_PORT: 2368
+      # see https://ghost.org/docs/config/#configuration-options
+      database__client: sqlite3
+      database__connection__filename: "content/data/ghost.db"
+      # this url value is just an example, and is likely wrong for your environment!
+      url: http://ghost.apps.home.arpa
+      # contrary to the default mentiooned in the linked documentation, this image defaults to NODE_ENV=production (so development mode needs to be explicitly specified if desired)
+      #NODE_ENV: development
+    labels:
+      - homepage.group=Containers
+      - homepage.name=Ghost
+      - homepage.href=http://ghost.apps.home.arpa
+      - homepage.description=Ghost Service
+      - "diun.enable=true"
+      - "diun.watch_repo=true"
+      - "diun.include_tags=alpine"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.backend=pihole"
+      - "traefik.port=2368"
+      - traefik.http.routers.ghost.rule=Host(`ghost.apps.home.arpa`)
+      - "traefik.http.services.ghost.loadbalancer.server.port=2368"
+      - "traefik.http.routers.ghost.entrypoints=web"
+
+volumes:
+  ghost:

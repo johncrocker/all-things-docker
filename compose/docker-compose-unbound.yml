@@ -2,46 +2,38 @@
 version: "3.9"
 
 services:
-  unbound-dns-a:
+  unbound-dns:
     environment:
-      - TZ=${TZ}
+      - TZ=Europe/London
     restart: unless-stopped
-    container_name: unbound-dns-a
+    container_name: unbound-dns
+    hostnane: unbound-dns
     image: cdrocker/unbound:latest
     volumes:
-      - 'unbound-a-data:/etc/unbound/conf.d/'
+      - 'unbound-data:/etc/unbound/conf.d/'
     ports:
       - "5300:5300/udp"
       - "5300:5300/tcp"
     cap_add:
       - NET_ADMIN
+    networks:
+      - proxy
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
       - "diun.enable=true"
       - "diun.watch_repo=true"
       - "diun.include_tags=latest"
-
-#  unbound-dns-b:
-#    environment:
-#      - TZ=${TZ}
-#    restart: unless-stopped
-#    container_name: unbound-dns-b
-#    image: cdrocker/unbound:latest
-#    volumes:
-#      - 'unbound-b-data:/etc/unbound/conf.d/'
-#    ports:
-#      - "5301:5300/udp"
-#      - "5301:5300/tcp"
-#    cap_add:
-#      - NET_ADMIN
-#    labels:
-#      - "com.centurylinklabs.watchtower.enable=false"
-#      - "diun.enable=true"
-#      - "diun.watch_repo=true"
-#      - "diun.include_tags=latest"
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.unbound.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.unbound.entrypoints=dns"
+      - "traefik.tcp.routers.unbound.service=unbound-dns"
+      - "traefik.tcp.services.unbound-dns.loadbalancer.server.port=5300"
 
 volumes:
-  unbound-a-data:
-#  unbound-b-data:
+  unbound-data:
 
-
+networks:
+  proxy:
+    external: true
+  infrastructure:
+    external: true
